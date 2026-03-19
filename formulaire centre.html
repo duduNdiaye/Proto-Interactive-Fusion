@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Modification du centre – Stripe</title>
+<script type="text/javascript" src="/ruxitagentjs_ICA7NVfhqrux_10331260218130851.js" data-dtconfig="app=080b920e92cb7c12|owasp=1|featureHash=ICA7NVfhqrux|rdnt=1|uxrgce=1|cuc=0whp4dl8|mel=100000|expw=1|dpvc=1|md=mdcc1=a[name='ajs-user-display-name']@content,mdcc2=a[name='ajs-current-user-fullname']@content|lastModification=1772031823460|tp=500,50,0|srbbv=2|agentUri=/ruxitagentjs_ICA7NVfhqrux_10331260218130851.js|reportUrl=/rb_4530d31e-8df5-4109-97bc-7cc78cde8634|rid=RID_370824958|rpid=-357038548|domain=cegedim.com"></script><style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333; background: #fff; display: flex; flex-direction: column; }
+  .topbar { background: #26a69a; color: #fff; height: 48px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px 0 10px; z-index: 200; }
+  .tb-left { display: flex; align-items: center; gap: 10px; }
+  .tb-logo { font-weight: 700; font-size: 20px; letter-spacing: .5px; line-height: 1; display: flex; align-items: flex-start; }
+  .tb-logo sup { font-size: 9px; font-weight: 700; margin-top: 2px; background: rgba(255,255,255,0.35); border-radius: 2px; padding: 0 2px; line-height: 1.4; }
+  .tb-sep { width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 2px; }
+  .tb-title { font-size: 13px; opacity: .9; }
+  .tb-right { display: flex; align-items: center; gap: 14px; font-size: 12px; }
+  .tb-backoffice { display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.15); border-radius: 14px; padding: 3px 10px; font-size: 12px; }
+  .tb-backoffice::before { content: 'A'; background: rgba(255,255,255,0.25); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+  .body-wrap { display: flex; flex: 1; overflow: hidden; }
+  .sidebar { width: 195px; min-width: 195px; background: #fff; border-right: 1px solid #e8e8e8; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+  .sb-oneclick { margin: 10px 12px 6px; padding: 7px 12px; background: #e91e8c; color: #fff; border: none; border-radius: 18px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; }
+  .sb-oneclick::before { content: '⚡'; font-size: 13px; }
+  .sb-item { display: flex; align-items: center; gap: 11px; padding: 8px 14px 8px 10px; font-size: 13px; color: #616161; cursor: pointer; border-left: 3px solid transparent; user-select: none; white-space: nowrap; }
+  .sb-item:hover { background: #fff; }
+  .sb-item.active { color: #009688; border-left-color: #009688; background: rgba(0,150,136,0.06); font-weight: 500; }
+  .sb-icon { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; opacity: .7; }
+  .sb-item.active .sb-icon { opacity: 1; }
+  .sb-arrow { margin-left: auto; font-size: 9px; color: #bbb; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  .tabs { border-bottom: 1px solid #e0e0e0; display: flex; align-items: flex-end; padding: 0 18px; height: 45px; min-height: 45px; overflow-x: auto; flex-shrink: 0; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 0 10px 9px; height: 45px; display: flex; align-items: flex-end; font-size: 11.5px; color: #9e9e9e; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+  .tab:hover { color: #555; }
+  .tab.active { color: #e91e8c; border-bottom-color: #e91e8c; }
+  .content-split { display: flex; flex: 1; overflow: hidden; background: #fff; }
+  .form-panel { flex: 1; overflow-y: auto; padding: 20px 20px 100px; background: #fff; }
+  .form-panel::-webkit-scrollbar { width: 5px; }
+  .form-panel::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 3px; }
+  .two-col-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; --col-sync: 1; }
+  .col-left, .col-right { display: flex; flex-direction: column; gap: 18px; }
+  .col-left .section-card, .col-right .section-card { margin-bottom: 0; }
+
+  /* SECTION CARD */
+  .section-card { border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 18px; overflow: visible; background: #fff; }
+  .section-header { display: flex; align-items: center; gap: 10px; padding: 11px 16px 10px; border-bottom: 1px solid #f0f0f0; background: #fafafa; border-radius: 6px 6px 0 0; }
+  .section-num { width: 22px; height: 22px; background: #26a69a; color: #fff; border-radius: 50%; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-size: 13px; font-weight: 700; color: #26a69a; text-transform: uppercase; letter-spacing: .8px; flex: 1; }
+  .badge-new { background: #26a69a; color: #fff; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 500; letter-spacing: .3px; text-transform: none; }
+  .section-body { padding: 16px 16px 4px; }
+  .subsec-title { font-size: 11.5px; font-weight: 600; color: #424242; text-transform: uppercase; letter-spacing: .6px; margin: 4px 0 14px; padding-bottom: 5px; border-bottom: 1px dashed #424242; }
+
+  /* FIELDS */
+  .f { margin-bottom: 20px; position: relative; }
+  .f label { display: block; font-size: 13px; color: #212121; margin-bottom: 1px; line-height: 1.3; }
+  .f .req { color: #e91e8c; }
+  .f input[type="text"], .f input[type="email"], .f input[type="date"], .f input[type="number"], .f input[type="url"] { width: 100%; border: none; border-bottom: 1px solid #424242; padding: 5px 0 4px; font-size: 14px; color: #212121; background: transparent; outline: none; font-family: inherit; transition: border-color .2s; }
+  .f-phone input[type="text"] { border-bottom: none; }
+  .f input:focus { border-bottom-color: #26a69a; }
+  .f input::placeholder { color: #bdbdbd; font-size: 14px; }
+  .f-select { position: relative; }
+  .f-select select { width: 100%; border: none; border-bottom: 1px solid #424242; padding: 5px 20px 4px 0; font-size: 14px; color: #212121; background: transparent; outline: none; appearance: none; -webkit-appearance: none; font-family: inherit; cursor: pointer; }
+  .f-select select:focus { border-bottom-color: #26a69a; }
+  .f-select::after { content: '▾'; position: absolute; right: 2px; bottom: 6px; font-size: 12px; color: #424242; pointer-events: none; }
+  .phone-row { display: flex; align-items: center; border-bottom: 1px solid #424242; padding-bottom: 4px; gap: 3px; }
+  .phone-row:focus-within { border-bottom-color: #26a69a; }
+  .phone-flag { font-size: 16px; line-height: 1; }
+  .phone-caret { font-size: 10px; color: #424242; margin-right: 4px; }
+  .phone-row input { border: none; outline: none; font-size: 14px; flex: 1; background: transparent; font-family: inherit; color: #212121; padding: 2px 0; }
+  .phone-row input::placeholder { color: #bdbdbd; }
+  .f-phone input[type="text"] { border-bottom: none; }
+  .email-row { position: relative; }
+  .email-row input { padding-right: 22px; }
+  .email-swap { position: absolute; right: 0; bottom: 4px; color: #26a69a; font-size: 17px; cursor: pointer; opacity: .8; }
+  .chk-row { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 20px; }
+  .chk-row input[type="checkbox"] { width: 15px; height: 15px; margin-top: 2px; flex-shrink: 0; accent-color: #26a69a; cursor: pointer; }
+  .chk-row label { font-size: 13px; color: #212121; line-height: 1.5; cursor: pointer; }
+  .row2 { display: flex; gap: 16px; }
+  .row2 .f { flex: 1; }
+  .row2 .f.w80 { flex: 0 0 80px; }
+
+  .upload-wrap { margin-bottom: 14px; }
+  .upload-wrap > label { display: block; font-size: 13px; color: #212121; margin-bottom: 5px; }
+  .upload-box { border: 1px dashed #424242; border-radius: 3px; padding: 14px 12px; text-align: center; font-size: 13px; color: #424242; cursor: pointer; background: #fafafa; transition: all .2s; line-height: 1.5; }
+  .upload-box:hover { border-color: #26a69a; color: #26a69a; background: #f0faf9; }
+
+  /* BEF CARD */
+  .bef-block { border: 1px solid #e8e8e8; border-radius: 4px; padding: 14px 14px 4px; margin-bottom: 12px; background: #fafcfc; }
+  .bef-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .bef-num { font-size: 13px; font-weight: 600; color: #26a69a; }
+  .btn-rm { background: none; border: none; color: #bdbdbd; font-size: 20px; cursor: pointer; line-height: 1; padding: 0; }
+  .btn-rm:hover { color: #e53935; }
+
+  /* BUTTONS */
+  .btn-add { display: inline-flex; align-items: center; gap: 5px; color: #26a69a; background: none; border: 1px solid #26a69a; border-radius: 3px; padding: 6px 16px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .btn-add:hover { background: rgba(0,150,136,.06); }
+  .btn-stripe { display: inline-flex; align-items: center; border: 1px solid #26a69a; color: #26a69a; background: transparent; padding: 9px 20px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; letter-spacing: .5px; text-transform: uppercase; }
+  .btn-stripe:hover { background: #26a69a; color: #fff; }
+
+  /* FOOTER */
+  .footer { position: fixed; bottom: 0; left: 195px; right: 0; background: #fff; border-top: 1px solid #e0e0e0; padding: 9px 22px; display: flex; justify-content: flex-end; gap: 10px; z-index: 100; }
+  .btn-cancel { border: none; background: none; color: #26a69a; font-size: 13px; font-weight: 500; padding: 8px 16px; cursor: pointer; font-family: inherit; text-transform: uppercase; letter-spacing: .5px; }
+  .btn-save { background: #26a69a; color: #fff; border: none; padding: 8px 22px; border-radius: 3px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ERROR BANNERS */
+  .error-banner { background: #fffbea; border-left: 4px solid #e6a817; border-radius: 0 4px 4px 0; padding: 12px 16px; margin-bottom: 16px; }
+  .eb-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .eb-icon { font-size: 16px; }
+  .eb-title { font-size: 14px; font-weight: 700; color: #b45309; }
+  .eb-desc { font-size: 13px; color: #92400e; margin-bottom: 10px; line-height: 1.5; }
+  .eb-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .eb-tag { border: 1px solid #d97706; color: #92400e; background: transparent; border-radius: 4px; padding: 2px 10px; font-size: 12px; font-weight: 500; }
+
+  /* ACCESS */
+  .multi-select-wrap { position: relative; margin-bottom: 14px; }
+  .multi-select-trigger { width: 100%; border: none; border-bottom: 1px solid #bdbdbd; padding: 5px 22px 4px 0; font-size: 14px; color: #9e9e9e; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; }
+  .multi-select-trigger.has-value { color: #212121; }
+  .multi-select-trigger.open { border-bottom-color: #26a69a; }
+  .multi-select-trigger .trigger-arrow { font-size: 12px; color: #9e9e9e; position: absolute; right: 2px; bottom: 6px; }
+  .multi-dropdown { display: none; position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 3px; box-shadow: 0 3px 10px rgba(0,0,0,0.12); z-index: 50; max-height: 180px; overflow-y: auto; }
+  .multi-dropdown.open { display: block; }
+  .multi-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 40px 10px 14px; cursor: pointer; font-size: 14px; color: #424242; position: relative; }
+  .multi-dropdown-item:hover { background: #fff; }
+  .multi-dropdown-item input[type="checkbox"] { accent-color: #26a69a; width: 15px; height: 15px; flex-shrink: 0; position: absolute; right: 14px; cursor: pointer; }
+  .access-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .access-tag { display: inline-flex; align-items: center; gap: 6px; background: #e0f2f1; border: 1px solid #b2dfdb; border-radius: 14px; padding: 4px 12px 4px 6px; font-size: 13px; color: #00695c; }
+  .access-tag .tag-avatar { width: 22px; height: 22px; background: #26a69a; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 600; }
+  .access-tag .tag-rm { background: none; border: none; color: #80cbc4; font-size: 15px; cursor: pointer; line-height: 1; padding: 0; margin-left: 2px; }
+  .access-tag .tag-rm:hover { color: #e53935; }
+  .info-note { font-size: 12px; color: #9e9e9e; font-style: italic; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+
+  /* TOOLTIP */
+  .tooltip-wrap { position: relative; display: inline-flex; align-items: center; margin-left: 5px; cursor: help; font-size: 13px; }
+  .tooltip-box { display: none; position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(100% + 6px); background: #212121; color: #fff; font-size: 11.5px; padding: 6px 10px; border-radius: 4px; white-space: nowrap; z-index: 100; font-weight: 400; }
+  .tooltip-wrap:hover .tooltip-box { display: block; }
+
+  /* ACCORDÉON BEF */
+  .accord-item { border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 8px; overflow: hidden; }
+  .accord-head { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; background: #fafafa; user-select: none; transition: background .15s; }
+  .accord-head:hover { background: #f0faf9; }
+  .accord-item.open .accord-head { background: #e8f5f4; border-bottom: 1px solid #e0e0e0; }
+  .accord-left { display: flex; align-items: center; gap: 10px; }
+  .accord-num { width: 22px; height: 22px; background: #26a69a; color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .accord-name { font-size: 13px; font-weight: 600; color: #424242; }
+  .accord-pct { font-size: 12px; color: #fff; background: #26a69a; border-radius: 10px; padding: 2px 8px; font-weight: 500; }
+  .accord-pct:empty { display: none; }
+  .accord-right { display: flex; align-items: center; gap: 8px; }
+  .accord-arrow { font-size: 12px; color: #9e9e9e; transition: transform .2s; }
+  .accord-item.open .accord-arrow { transform: rotate(0deg); }
+  .accord-body { display: none; padding: 16px 14px 8px; background: #fff; }
+  .accord-item.open .accord-body { display: block; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-logo">Maiia<sup>+</sup></div>
+    <div class="tb-sep"></div>
+    <div class="tb-title">Modification du centre – Centre de démonstration produit PM Interop</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-backoffice">BackOffice Maiia</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;">NDIAYE Pape Amadou Dieye →</div>
+  </div>
+</div>
+
+<div class="body-wrap">
+  <div class="sidebar">
+    <button class="sb-oneclick">OneClick création</button>
+    <div class="sb-item active"><span class="sb-icon">🏥</span>Centres</div>
+    <div class="sb-item"><span class="sb-icon">👤</span>Praticiens</div>
+    <div class="sb-item"><span class="sb-icon">👥</span>Utilisateurs</div>
+    <div class="sb-item"><span class="sb-icon">🔍</span>Utilisateurs à vérifier</div>
+    <div class="sb-item"><span class="sb-icon">📋</span>TLC assistée</div>
+    <div class="sb-item"><span class="sb-icon">🧑‍⚕️</span>Patients</div>
+    <div class="sb-item"><span class="sb-icon">💰</span>Offres</div>
+    <div class="sb-item"><span class="sb-icon">⭐</span>Spécialités</div>
+    <div class="sb-item"><span class="sb-icon">🔧</span>Expertises</div>
+    <div class="sb-item"><span class="sb-icon">📓</span>Journal</div>
+    <div class="sb-item"><span class="sb-icon">🏦</span>Mutuelles / Caisses<span class="sb-arrow">▾</span></div>
+    <div class="sb-item"><span class="sb-icon">📍</span>Coordinations<span class="sb-arrow">▾</span></div>
+    <div class="sb-item"><span class="sb-icon">📱</span>Applications<span class="sb-arrow">▾</span></div>
+    <div class="sb-item"><span class="sb-icon">📣</span>Campagnes<span class="sb-arrow">▾</span></div>
+    <div class="sb-item"><span class="sb-icon">🔔</span>Notification<span class="sb-arrow">▾</span></div>
+    <div class="sb-item"><span class="sb-icon">📊</span>Statistiques</div>
+    <div class="sb-item"><span class="sb-icon">📥</span>Import<span class="sb-arrow">▾</span></div>
+    <div class="sb-item"><span class="sb-icon">📖</span>Annuaire</div>
+    <div class="sb-item"><span class="sb-icon">💬</span>Support</div>
+    <div class="sb-item"><span class="sb-icon">🔄</span>Synchronisation</div>
+    <div class="sb-item"><span class="sb-icon">🗄️</span>Base de données</div>
+  </div>
+
+  <div class="main">
+    <div class="tabs">
+      <div class="tab">PARAMÈTRES GLOBAUX</div>
+      <div class="tab active">STRIPE</div>
+      <div class="tab">RÉFÉRENT</div>
+      <div class="tab">UTILISATEURS (2)</div>
+      <div class="tab">PRATICIENS (1)</div>
+      <div class="tab">TLC ASSISTÉE</div>
+      <div class="tab">FONCTIONNALITÉS</div>
+      <div class="tab">HIÉRARCHIE</div>
+      <div class="tab">JOURNAL</div>
+      <div class="tab">STATISTIQUES</div>
+    </div>
+
+    <div class="content-split">
+      <div class="form-panel">
+        <div class="two-col-layout">
+
+          <!-- COLONNE GAUCHE : Infos centre + Représentant -->
+          <div class="col-left">
+            <div class="section-card">
+              <div class="section-header"><div class="section-title">Informations du centre</div></div>
+              <div class="section-body">
+                <div class="f"><label>Id du compte Stripe</label><input type="text" placeholder="acct_…"/></div>
+                <div class="row2">
+                  <div class="f"><label>N° SIRET <span class="req">*</span></label><input type="text"/></div>
+                  <div class="f"><label>IBAN <span class="req">*</span></label><input type="text" placeholder="FR76 …"/></div>
+                </div>
+                <div class="f"><label>Site web du centre <span class="req">*</span></label><input type="url" value="https://www.maiia.com"/></div>
+                <div class="f f-phone">
+                  <label>Téléphone du centre <span class="req">*</span></label>
+                  <div class="phone-row"><span class="phone-flag">🇫🇷</span><span class="phone-caret">▾</span><input type="text" placeholder="Numéro de téléphone"/></div>
+                </div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header"><div class="section-title">Représentant du compte</div></div>
+              <div class="section-body">
+                <div class="chk-row">
+                  <input type="checkbox" id="chk1"/>
+                  <label for="chk1">Cette personne est un dirigeant ou cadre supérieur assumant des responsabilités importantes dans la direction de l'entreprise</label>
+                </div>
+                <div class="f f-select">
+                  <label>Praticien du centre</label>
+                  <select><option value="">Choisir un praticien du centre</option><option>Dr. Martin Dupont</option><option>Dr. Sophie Bernard</option></select>
+                </div>
+                <div class="f"><label>Intitulé du poste (PDG, directeur, partenaire…)</label><input type="text" value="Directeur"/></div>
+                <div class="row2">
+                  <div class="f"><label>Nom <span class="req">*</span></label><input type="text"/></div>
+                  <div class="f"><label>Prénom <span class="req">*</span></label><input type="text"/></div>
+                </div>
+                <div class="f"><label>Date de naissance <span class="req">*</span></label><input type="text" placeholder="jj/mm/aaaa"/></div>
+                <div class="f">
+                  <label>Login (email) <span class="req">*</span></label>
+                  <div class="email-row"><input type="email" placeholder=""/><span class="email-swap">⇄</span></div>
+                </div>
+                <div class="f f-phone">
+                  <label>Numéro de téléphone <span class="req">*</span></label>
+                  <div class="phone-row"><span class="phone-flag">🇫🇷</span><span class="phone-caret">▾</span><input type="text" placeholder="Numéro de téléphone"/></div>
+                </div>
+                <div class="f"><label>Numéro d'identification national</label><input type="text" placeholder="Numéro d'identification national"/></div>
+                <div class="f">
+                  <label style="color:#26a69a;font-size:12px;">Adresse <span class="req">*</span></label>
+                  <div style="position:relative;"><input type="text" placeholder="Rechercher une adresse…" style="padding-right:24px;"/><span style="position:absolute;right:0;bottom:4px;color:#9e9e9e;font-size:14px;cursor:pointer;">×</span></div>
+                </div>
+                <div class="row2">
+                  <div class="f w80"><label>Numéro</label><input type="text"/></div>
+                  <div class="f"><label>Rue</label><input type="text"/></div>
+                </div>
+                <div class="row2">
+                  <div class="f"><label>Code postal</label><input type="text"/></div>
+                  <div class="f"><label>Code INSEE</label><input type="text"/></div>
+                </div>
+                <div class="f"><label>Ville</label><input type="text"/></div>
+                <div class="f"><label>Pays</label><input type="text" value="France" readonly style="color:#9e9e9e;cursor:not-allowed"/></div>
+                <div class="row2">
+                  <div class="upload-wrap" style="flex:1"><label>Recto pièce d'identité <span class="req">*</span> <span style="color:#bdbdbd">(JPG, PNG)</span></label><div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div></div>
+                  <div class="upload-wrap" style="flex:1"><label>Verso pièce d'identité <span class="req">*</span> <span style="color:#bdbdbd">(JPG, PNG)</span></label><div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div></div>
+                </div>
+                <div class="upload-wrap">
+                  <label>Justificatif de domicile <span class="req">*</span> <span style="color:#bdbdbd">(JPG, PNG, PDF)</span></label>
+                  <div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLONNE DROITE : BEF + Directeurs + Vérif entité + Attestation -->
+          <div class="col-right">
+            <div class="section-card">
+              <div class="section-header"><div class="section-title">Bénéficiaires effectifs finaux (BEF)</div><span class="badge-new">Nouveau</span></div>
+              <div class="section-body">
+                <div style="font-size:13px;color:#757575;margin-bottom:16px;line-height:1.6;">Déclarez toutes les personnes détenant directement ou indirectement <strong>25% ou plus</strong> du capital du centre.</div>
+                <div id="bef-list">
+                  <div class="accord-item open" id="bef-1">
+                    <div class="accord-head" onclick="toggleBef('bef-1')">
+                      <div class="accord-left"><span class="accord-num">1</span><span class="accord-name" id="bef-1-label">Nouveau bénéficiaire</span><span class="accord-pct" id="bef-1-pct"></span></div>
+                      <div class="accord-right"><span class="accord-arrow" id="bef-1-arrow">▾</span><button class="btn-rm" onclick="event.stopPropagation();rmBef('bef-1')">×</button></div>
+                    </div>
+                    <div class="accord-body" id="bef-1-body">
+                      <div class="row2">
+                        <div class="f"><label>Nom <span class="req">*</span></label><input type="text" oninput="updateBefLabel('bef-1')"/></div>
+                        <div class="f"><label>Prénom <span class="req">*</span></label><input type="text" oninput="updateBefLabel('bef-1')"/></div>
+                      </div>
+                      <div class="f"><label>Date de naissance <span class="req">*</span></label><input type="text" placeholder="jj/mm/aaaa"/></div>
+                      <div class="f"><label>Adresse email <span class="req">*</span></label><input type="email"/></div>
+                      <div class="f"><label>Adresse <span class="req">*</span></label><input type="text" placeholder="N° et nom de rue"/></div>
+                      <div class="row2">
+                        <div class="f"><label>Ville <span class="req">*</span></label><input type="text"/></div>
+                        <div class="f"><label>Code postal <span class="req">*</span></label><input type="text" maxlength="5"/></div>
+                      </div>
+                      <div class="f"><label>Pays <span class="req">*</span></label><input type="text" value="France" readonly style="color:#9e9e9e;cursor:not-allowed"/></div>
+                      <div class="row2">
+                        <div class="upload-wrap" style="flex:1;margin-bottom:8px"><label>Recto pièce d'identité <span style="color:#9e9e9e;font-style:italic">(optionnel)</span></label><div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div></div>
+                        <div class="upload-wrap" style="flex:1;margin-bottom:8px"><label>Verso pièce d'identité <span style="color:#9e9e9e;font-style:italic">(optionnel)</span></label><div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn-add" onclick="addBef()">+ Ajouter un bénéficiaire</button>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header"><div class="section-title">Directeurs</div><span class="badge-new">Nouveau</span></div>
+              <div class="section-body">
+                <div style="font-size:13px;color:#757575;margin-bottom:16px;line-height:1.6;">Déclarez les membres du conseil d'administration ou personnes responsables de la gestion du centre (CEO, COO, directeur général…).</div>
+                <div id="dir-list">
+                  <div class="accord-item open" id="dir-1">
+                    <div class="accord-head" onclick="toggleDir('dir-1')">
+                      <div class="accord-left"><span class="accord-num">1</span><span class="accord-name" id="dir-1-label">Nouveau directeur</span></div>
+                      <div class="accord-right"><span class="accord-arrow">▾</span><button class="btn-rm" onclick="event.stopPropagation();rmDir('dir-1')">×</button></div>
+                    </div>
+                    <div class="accord-body" id="dir-1-body">
+                      <div class="row2">
+                        <div class="f"><label>Nom <span class="req">*</span></label><input type="text" oninput="updateDirLabel('dir-1')"/></div>
+                        <div class="f"><label>Prénom <span class="req">*</span></label><input type="text" oninput="updateDirLabel('dir-1')"/></div>
+                      </div>
+                      <div class="f"><label>Adresse email <span class="req">*</span></label><input type="email"/></div>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn-add" onclick="addDir()">+ Ajouter un directeur</button>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header"><div class="section-title">Vérification de l'entité juridique</div><span class="badge-new">Nouveau</span></div>
+              <div class="section-body">
+                <div class="upload-wrap" style="margin-bottom:4px">
+                  <label>Document justificatif <span class="tooltip-wrap">ℹ️<span class="tooltip-box">Types acceptés : Kbis, statuts, VAT Registration — JPG, PNG, PDF</span></span></label>
+                  <div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div>
+                </div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header"><div class="section-title">Attestation numérique des bénéficiaires effectifs</div><span class="badge-new">Nouveau</span></div>
+              <div class="section-body">
+                <div class="upload-wrap" style="margin-bottom:4px">
+                  <label>Attestation des bénéficiaires effectifs <span style="color:#bdbdbd">— JPG, PNG, PDF</span></label>
+                  <div class="upload-box">Déposez le document à uploader, ou cliquez pour le sélectionner.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PLEINE LARGEUR : Accès configuration Stripe -->
+        <div class="section-card" style="margin-top:18px">
+          <div class="section-header"><div class="section-title">Accès configuration Stripe</div><span class="badge-new">Nouveau</span></div>
+          <div class="section-body" style="padding-bottom:16px">
+            <div style="font-size:13px;color:#757575;margin-bottom:14px;line-height:1.6;">
+              L'utilisateur avec le rôle <strong>Administrateur</strong> du centre est automatiquement désigné comme responsable de la configuration du compte Stripe.
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:#f0faf9;border:1px solid #b2dfdb;border-radius:6px;padding:12px 16px;">
+              <div style="width:36px;height:36px;background:#26a69a;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;flex-shrink:0;">MD</div>
+              <div>
+                <div style="font-size:14px;font-weight:500;color:#212121;">Martin Dupont</div>
+                <div style="font-size:12px;color:#26a69a;font-weight:500;">Administrateur</div>
+              </div>
+              <div style="margin-left:auto;font-size:12px;color:#757575;font-style:italic;">Attribué automatiquement</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px;margin-bottom:12px">
+          <button class="btn-stripe">Créer un compte Stripe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="btn-cancel">Annuler</button>
+  <button class="btn-save">Sauvegarder</button>
+</div>
+
+<script>
+  let befN = 1;
+
+  function toggleBef(id) {
+    const item = document.getElementById(id);
+    item.classList.toggle('open');
+  }
+
+  function updateBefLabel(id) {
+    const body = document.getElementById(id + '-body');
+    const inputs = body.querySelectorAll('input[type="text"]');
+    const nom = inputs[0].value.trim();
+    const prenom = inputs[1] ? inputs[1].value.trim() : '';
+    const label = document.getElementById(id + '-label');
+    label.textContent = (nom || prenom) ? ((prenom + ' ' + nom).trim()) : 'Nouveau bénéficiaire';
+  }
+
+  function updateBefPct(id, val) {
+    const pct = document.getElementById(id + '-pct');
+    pct.textContent = val ? val + '%' : '';
+  }
+
+  function addBef() {
+    befN++;
+    const id = 'bef-' + befN;
+    const d = document.createElement('div');
+    d.className = 'accord-item open'; d.id = id;
+    d.innerHTML = `
+      <div class="accord-head" onclick="toggleBef('${id}')">
+        <div class="accord-left">
+          <span class="accord-num">${befN}</span>
+          <span class="accord-name" id="${id}-label">Nouveau bénéficiaire</span>
+        </div>
+        <div class="accord-right">
+          <span class="accord-arrow" id="${id}-arrow">▾</span>
+          <button class="btn-rm" onclick="event.stopPropagation();rmBef('${id}')">×</button>
+        </div>
+      </div>
+      <div class="accord-body" id="${id}-body">
+        <div class="row2">
+          <div class="f"><label>Nom <span class="req">*</span></label><input type="text" oninput="updateBefLabel('${id}')"/></div>
+          <div class="f"><label>Prénom <span class="req">*</span></label><input type="text" oninput="updateBefLabel('${id}')"/></div>
+        </div>
+        <div class="f"><label>Date de naissance <span class="req">*</span></label><input type="text" placeholder="jj/mm/aaaa"/></div>
+        <div class="f"><label>Adresse email <span class="req">*</span></label><input type="email"/></div>
+        <div class="f"><label>Adresse <span class="req">*</span></label><input type="text" placeholder="N° et nom de rue"/></div>
+        <div class="row2">
+          <div class="f"><label>Ville <span class="req">*</span></label><input type="text"/></div>
+          <div class="f"><label>Code postal <span class="req">*</span></label><input type="text" maxlength="5"/></div>
+        </div>
+        <div class="f"><label>Pays <span class="req">*</span></label><input type="text" value="France" readonly style="color:#9e9e9e;cursor:not-allowed"/></div>
+        <div class="row2">
+          <div class="upload-wrap" style="flex:1;margin-bottom:8px"><label>Recto pièce d'identité <span style="color:#9e9e9e;font-style:italic">(optionnel)</span></label><div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div></div>
+          <div class="upload-wrap" style="flex:1;margin-bottom:8px"><label>Verso pièce d'identité <span style="color:#9e9e9e;font-style:italic">(optionnel)</span></label><div class="upload-box">Déposez l'image à uploader, ou cliquez pour la sélectionner.</div></div>
+        </div>
+      </div>`;
+    document.getElementById('bef-list').appendChild(d);
+  }
+
+  function rmBef(id) { const e = document.getElementById(id); if (e) e.remove(); }
+
+  let dirN = 1;
+  function toggleDir(id) { document.getElementById(id).classList.toggle('open'); }
+  function updateDirLabel(id) {
+    const body = document.getElementById(id + '-body');
+    const inputs = body.querySelectorAll('input[type="text"]');
+    const nom = inputs[0].value.trim(), prenom = inputs[1] ? inputs[1].value.trim() : '';
+    document.getElementById(id + '-label').textContent = (nom || prenom) ? ((prenom + ' ' + nom).trim()) : 'Nouveau directeur';
+  }
+  function addDir() {
+    dirN++;
+    const id = 'dir-' + dirN;
+    const d = document.createElement('div');
+    d.className = 'accord-item open'; d.id = id;
+    d.innerHTML = `
+      <div class="accord-head" onclick="toggleDir('${id}')">
+        <div class="accord-left">
+          <span class="accord-num">${dirN}</span>
+          <span class="accord-name" id="${id}-label">Nouveau directeur</span>
+        </div>
+        <div class="accord-right">
+          <span class="accord-arrow">▾</span>
+          <button class="btn-rm" onclick="event.stopPropagation();rmDir('${id}')">×</button>
+        </div>
+      </div>
+      <div class="accord-body" id="${id}-body">
+        <div class="row2">
+          <div class="f"><label>Nom <span class="req">*</span></label><input type="text" oninput="updateDirLabel('${id}')"/></div>
+          <div class="f"><label>Prénom <span class="req">*</span></label><input type="text" oninput="updateDirLabel('${id}')"/></div>
+        </div>
+        <div class="f"><label>Adresse email <span class="req">*</span></label><input type="email"/></div>
+      </div>`;
+    document.getElementById('dir-list').appendChild(d);
+  }
+  function rmDir(id) { const e = document.getElementById(id); if (e) e.remove(); }
+  function toggleDropdown() {
+    document.getElementById('multi-dropdown').classList.toggle('open');
+    document.getElementById('multi-trigger').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('multi-wrap');
+    if (wrap && !wrap.contains(e.target)) { document.getElementById('multi-dropdown').classList.remove('open'); document.getElementById('multi-trigger').classList.remove('open'); }
+  });
+  function onCheckUser(cb) {
+    const id = cb.value, name = cb.dataset.name, initials = cb.dataset.initials;
+    const tags = document.getElementById('access-tags');
+    if (cb.checked) { const tag = document.createElement('div'); tag.className = 'access-tag'; tag.id = 'tag-' + id; tag.innerHTML = `<span class="tag-avatar">${initials}</span>${name}<button class="tag-rm" onclick="removeTag('${id}')">×</button>`; tags.appendChild(tag); }
+    else { const t = document.getElementById('tag-' + id); if (t) t.remove(); }
+    const checked = document.querySelectorAll('#multi-dropdown input:checked');
+    document.getElementById('trigger-label').textContent = checked.length === 0 ? '-- Sélectionner des utilisateurs --' : checked.length + ' utilisateur' + (checked.length > 1 ? 's' : '') + ' sélectionné' + (checked.length > 1 ? 's' : '');
+    document.getElementById('multi-trigger').classList.toggle('has-value', checked.length > 0);
+  }
+  function removeTag(id) {
+    const tag = document.getElementById('tag-' + id); if (tag) tag.remove();
+    const cb = document.querySelector('#multi-dropdown input[value="' + id + '"]'); if (cb) cb.checked = false;
+    const checked = document.querySelectorAll('#multi-dropdown input:checked');
+    document.getElementById('trigger-label').textContent = checked.length === 0 ? '-- Sélectionner des utilisateurs --' : checked.length + ' utilisateur' + (checked.length > 1 ? 's' : '') + ' sélectionné' + (checked.length > 1 ? 's' : '');
+    document.getElementById('multi-trigger').classList.toggle('has-value', checked.length > 0);
+  }
+</script>
+</body>
+</html>
