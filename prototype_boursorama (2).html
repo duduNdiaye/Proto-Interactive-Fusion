@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boursorama × papernest — Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    background: #0f0f0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    padding: 24px;
+  }
+
+  .stage {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  /* ── Phone shell ── */
+  .phone {
+    width: 375px;
+    height: 780px;
+    background: #111;
+    border-radius: 48px;
+    border: 2px solid #333;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .phone-notch {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 32px;
+    background: #111;
+    border-radius: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .camera { width: 10px; height: 10px; background: #222; border-radius: 50%; border: 2px solid #333; }
+
+  /* ── Screens ── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    background: #f5f6fa;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .screen.active { display: flex; }
+
+  /* ── Status bar ── */
+  .status-bar {
+    background: #fff;
+    padding: 14px 20px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #111;
+    flex-shrink: 0;
+    padding-top: 52px;
+  }
+  .status-icons { display:flex; gap:6px; align-items:center; font-size:11px; }
+
+  /* ── Header bar ── */
+  .topbar {
+    background: #fff;
+    padding: 12px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+  }
+  .topbar-back {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #1a56db;
+    font-size: 20px;
+  }
+  .topbar-title { font-size: 16px; font-weight: 600; color: #111; }
+  .topbar-logo { font-size: 18px; font-weight: 700; color: #1a56db; letter-spacing: -0.5px; }
+
+  /* ── Scroll area ── */
+  .scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  /* ── Bottom tab bar ── */
+  .tab-bar {
+    background: #fff;
+    border-top: 1px solid #eee;
+    display: flex;
+    padding: 8px 0 16px;
+    flex-shrink: 0;
+  }
+  .tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: #999;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .tab.active { color: #1a56db; }
+  .tab-icon { font-size: 20px; line-height: 1; }
+
+  /* ── HOME SCREEN ── */
+  .home-greeting {
+    padding: 20px 20px 12px;
+    background: #fff;
+  }
+  .home-greeting h2 { font-size: 22px; font-weight: 600; color: #111; }
+  .home-greeting p { font-size: 13px; color: #888; margin-top: 2px; }
+
+  .balance-card {
+    margin: 0 16px 16px;
+    background: linear-gradient(135deg, #1a56db 0%, #0f3a9a 100%);
+    border-radius: 20px;
+    padding: 24px;
+    color: #fff;
+  }
+  .balance-label { font-size: 12px; opacity: 0.8; letter-spacing: 0.5px; text-transform: uppercase; }
+  .balance-amount { font-size: 36px; font-weight: 600; margin: 6px 0 16px; letter-spacing: -1px; font-family: 'DM Mono', monospace; }
+  .balance-actions { display: flex; gap: 10px; }
+  .balance-btn {
+    flex: 1; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 10px; padding: 8px; font-size: 12px; font-weight: 500; color: #fff;
+    text-align: center; cursor: pointer;
+  }
+
+  .section-title {
+    padding: 16px 20px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  /* ── PAPERNEST BANNER ── */
+  .papernest-banner {
+    margin: 0 16px 16px;
+    background: linear-gradient(135deg, #e8f4fd 0%, #f0faff 100%);
+    border: 1.5px solid #1a56db;
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+  .papernest-banner:active { transform: scale(0.98); }
+  .papernest-banner::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: rgba(26,86,219,0.06);
+    border-radius: 50%;
+  }
+  .banner-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .banner-icon {
+    width: 36px; height: 36px;
+    background: #1a56db;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .banner-label { font-size: 15px; font-weight: 600; color: #1a56db; }
+  .banner-sub { font-size: 12px; color: #4477cc; }
+  .banner-stat {
+    background: #1a56db;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .banner-stat-left { color: #fff; }
+  .banner-stat-label { font-size: 11px; opacity: 0.8; }
+  .banner-stat-amount { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .banner-arrow { color: rgba(255,255,255,0.7); font-size: 18px; }
+
+  /* ── Transactions ── */
+  .tx-list { padding: 0 16px 8px; }
+  .tx-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .tx-logo {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .tx-info { flex: 1; }
+  .tx-name { font-size: 13px; font-weight: 500; color: #111; }
+  .tx-date { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .tx-amount { font-size: 14px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .tx-amount.neg { color: #e53e3e; }
+
+  /* ── SUBSCRIPTIONS SCREEN ── */
+  .subs-hero {
+    background: #fff;
+    padding: 16px 20px 20px;
+    border-bottom: 1px solid #eee;
+  }
+  .subs-hero-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .subs-hero-row { display: flex; align-items: baseline; gap: 6px; margin: 4px 0 12px; }
+  .subs-hero-amount { font-size: 38px; font-weight: 600; font-family: 'DM Mono', monospace; color: #111; }
+  .subs-hero-unit { font-size: 16px; color: #888; }
+  .subs-alert {
+    background: #fff8e1;
+    border: 1px solid #f6c90e;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #7a5c00;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+  }
+  .filter-row::-webkit-scrollbar { display:none; }
+  .filter-pill {
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid #ddd;
+    color: #555;
+    background: #fff;
+    transition: all 0.15s;
+  }
+  .filter-pill.active { background: #1a56db; border-color: #1a56db; color: #fff; }
+
+  .sub-card {
+    margin: 0 16px 10px;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .sub-card:active { transform: scale(0.98); }
+  .sub-card-inner { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .sub-logo {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .sub-info { flex: 1; }
+  .sub-name { font-size: 14px; font-weight: 600; color: #111; }
+  .sub-detail { font-size: 12px; color: #888; margin-top: 2px; }
+  .sub-right { text-align: right; }
+  .sub-price { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; color: #111; }
+  .sub-freq { font-size: 11px; color: #aaa; }
+  .sub-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .tag-active { background: #e8f8ee; color: #1a7a3a; }
+  .tag-alert { background: #fff3cd; color: #856404; }
+  .tag-unused { background: #fde8e8; color: #c53030; }
+
+  /* ── DETAIL SCREEN ── */
+  .detail-hero {
+    background: #fff;
+    padding: 24px 20px 20px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  .detail-logo-big {
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 12px;
+  }
+  .detail-name { font-size: 22px; font-weight: 700; color: #111; }
+  .detail-price { font-size: 32px; font-weight: 600; font-family: 'DM Mono', monospace; color: #111; margin: 4px 0 2px; }
+  .detail-billing { font-size: 13px; color: #888; }
+
+  .detail-stats {
+    display: flex;
+    padding: 16px;
+    gap: 10px;
+  }
+  .detail-stat {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+  .detail-stat-value { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; color: #111; }
+  .detail-stat-label { font-size: 10px; color: #999; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  .detail-section { padding: 0 16px 16px; }
+  .detail-section-title { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .detail-row {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .detail-row-label { font-size: 13px; color: #555; }
+  .detail-row-value { font-size: 13px; font-weight: 500; color: #111; }
+
+  .action-btn {
+    margin: 0 16px 10px;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.1s;
+  }
+  .action-btn:active { transform: scale(0.97); opacity: 0.85; }
+  .btn-cancel { background: #fff0f0; color: #e53e3e; border: 1.5px solid #fcc; }
+  .btn-primary { background: #1a56db; color: #fff; }
+  .btn-secondary { background: #f0f4ff; color: #1a56db; border: 1.5px solid #c0d0f8; }
+
+  /* ── CANCEL CONFIRM SCREEN ── */
+  .cancel-illustration {
+    padding: 40px 20px 20px;
+    text-align: center;
+  }
+  .cancel-emoji { font-size: 64px; display: block; margin-bottom: 16px; }
+  .cancel-title { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 8px; }
+  .cancel-sub { font-size: 14px; color: #666; line-height: 1.5; }
+
+  .cancel-summary {
+    margin: 0 16px 16px;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .cancel-row { padding: 14px 16px; display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; }
+  .cancel-row:last-child { border-bottom: none; }
+  .cancel-row-label { font-size: 13px; color: #666; }
+  .cancel-row-value { font-size: 13px; font-weight: 600; color: #111; }
+
+  /* ── SUCCESS SCREEN ── */
+  .success-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+  }
+  .success-circle {
+    width: 96px; height: 96px;
+    background: #e8f8ee;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    margin-bottom: 24px;
+    animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-title { font-size: 24px; font-weight: 700; color: #111; margin-bottom: 10px; }
+  .success-sub { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 32px; }
+  .success-saving {
+    background: #e8f8ee;
+    border-radius: 16px;
+    padding: 16px 24px;
+    margin-bottom: 32px;
+    width: 100%;
+  }
+  .success-saving-label { font-size: 12px; color: #1a7a3a; text-transform: uppercase; letter-spacing: 0.5px; }
+  .success-saving-amount { font-size: 32px; font-weight: 700; font-family: 'DM Mono', monospace; color: #1a7a3a; }
+  .success-saving-sub { font-size: 11px; color: #4a9a5a; margin-top: 2px; }
+
+  /* ── Right panel (steps guide) ── */
+  .guide {
+    width: 280px;
+    color: #fff;
+  }
+  .guide-title { font-size: 13px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  .guide-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+  .guide-step.active { opacity: 1; }
+  .guide-step.done { opacity: 0.6; }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid #444;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #666;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .guide-step.active .step-num { border-color: #4a9eff; color: #4a9eff; background: rgba(74,158,255,0.1); }
+  .guide-step.done .step-num { border-color: #4caf50; background: #4caf50; color: #fff; }
+  .step-text { padding-top: 3px; }
+  .step-label { font-size: 13px; font-weight: 600; color: #eee; margin-bottom: 2px; }
+  .step-desc { font-size: 11px; color: #666; line-height: 1.4; }
+  .guide-step.active .step-label { color: #fff; }
+
+  /* ── Alert badge ── */
+  .alert-dot {
+    width: 8px; height: 8px;
+    background: #e53e3e;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px; right: 3px;
+  }
+
+  /* screen transition */
+  .screen { animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ══════════════════════ PHONE ══════════════════════ -->
+  <div class="phone">
+    <div class="phone-notch">
+      <div class="camera"></div>
+      <div style="width:60px;height:6px;background:#222;border-radius:4px"></div>
+      <div class="camera"></div>
+    </div>
+
+    <!-- ════ SCREEN 1 : Home ════ -->
+    <div class="screen active" id="screen-home">
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="status-icons">
+          <span>●●●</span>
+          <span>WiFi</span>
+          <span>🔋</span>
+        </div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-logo">Boursorama</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span style="font-size:20px;cursor:pointer">🔔</span>
+          <div style="width:32px;height:32px;background:#1a56db;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff">SD</div>
+        </div>
+      </div>
+      <div class="scroll">
+        <div class="home-greeting">
+          <h2>Bonjour, Sophie 👋</h2>
+          <p>Mardi 13 mai · Votre solde du jour</p>
+        </div>
+        <div class="balance-card">
+          <div class="balance-label">Compte courant</div>
+          <div class="balance-amount">2 847,50 €</div>
+          <div class="balance-actions">
+            <div class="balance-btn">Virer</div>
+            <div class="balance-btn">Recharger</div>
+            <div class="balance-btn">Épargner</div>
+          </div>
+        </div>
+
+        <div class="section-title">💡 Nouveau service</div>
+        <div class="papernest-banner" onclick="goTo('screen-subs'); setStep(1)">
+          <div class="banner-top">
+            <div class="banner-icon">📋</div>
+            <div>
+              <div class="banner-label">Mes abonnements</div>
+              <div class="banner-sub">Gérez tous vos contrats en 1 clic</div>
+            </div>
+          </div>
+          <div class="banner-stat">
+            <div class="banner-stat-left">
+              <div class="banner-stat-label">Vous dépensez chaque mois</div>
+              <div class="banner-stat-amount">124,85 €</div>
+            </div>
+            <div class="banner-arrow">→</div>
+          </div>
+        </div>
+
+        <div class="section-title">Dernières opérations</div>
+        <div class="tx-list">
+          <div class="tx-item">
+            <div class="tx-logo" style="background:#e8f0fe">🎵</div>
+            <div class="tx-info">
+              <div class="tx-name">Spotify</div>
+              <div class="tx-date">10 mai 2025</div>
+            </div>
+            <div class="tx-amount neg">-10,99 €</div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-logo" style="background:#ffe8e8">🎬</div>
+            <div class="tx-info">
+              <div class="tx-name">Netflix</div>
+              <div class="tx-date">8 mai 2025</div>
+            </div>
+            <div class="tx-amount neg">-17,99 €</div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-logo" style="background:#e8fff0">🛒</div>
+            <div class="tx-info">
+              <div class="tx-name">Monoprix</div>
+              <div class="tx-date">7 mai 2025</div>
+            </div>
+            <div class="tx-amount neg">-43,20 €</div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-logo" style="background:#fff8e8">📦</div>
+            <div class="tx-info">
+              <div class="tx-name">Amazon Prime</div>
+              <div class="tx-date">1 mai 2025</div>
+            </div>
+            <div class="tx-amount neg">-6,99 €</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab active"><div class="tab-icon">🏠</div><span>Accueil</span></div>
+        <div class="tab"><div class="tab-icon">💳</div><span>Cartes</span></div>
+        <div class="tab" style="position:relative" onclick="goTo('screen-subs'); setStep(1)">
+          <div class="tab-icon">📋</div><span style="color:#1a56db;font-weight:600">Abonnements</span>
+          <div class="alert-dot"></div>
+        </div>
+        <div class="tab"><div class="tab-icon">📊</div><span>Budget</span></div>
+        <div class="tab"><div class="tab-icon">👤</div><span>Profil</span></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 2 : Subscriptions list ════ -->
+    <div class="screen" id="screen-subs">
+      <div class="status-bar">
+        <span>9:42</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-back" onclick="goTo('screen-home')">←</div>
+        <div class="topbar-title">Mes abonnements</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="subs-hero">
+        <div class="subs-hero-label">Total mensuel détecté</div>
+        <div class="subs-hero-row">
+          <div class="subs-hero-amount">124,85 €</div>
+          <div class="subs-hero-unit">/mois</div>
+        </div>
+        <div class="subs-alert" onclick="goTo('screen-detail-canal')">
+          ⚠️ <span><strong>Canal+ a augmenté de 3 €</strong> ce mois-ci · Voir →</span>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-pill active">Tous (8)</div>
+        <div class="filter-pill">Streaming</div>
+        <div class="filter-pill">Télécom</div>
+        <div class="filter-pill">Musique</div>
+        <div class="filter-pill">Autres</div>
+      </div>
+      <div class="scroll">
+        <div class="sub-card" onclick="goTo('screen-detail-netflix')">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#ffe8e8">🎬</div>
+            <div class="sub-info">
+              <div class="sub-name">Netflix</div>
+              <div class="sub-detail">Streaming · Abonnement standard</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">17,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-active">Actif</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-card" onclick="goTo('screen-detail-canal')">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#e8f0fe">📺</div>
+            <div class="sub-info">
+              <div class="sub-name">Canal+</div>
+              <div class="sub-detail">Streaming · Hausse de prix détectée</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">26,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-alert">+3 € ⚠️</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#e8fff0">🎵</div>
+            <div class="sub-info">
+              <div class="sub-name">Spotify</div>
+              <div class="sub-detail">Musique · Premium</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">10,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-active">Actif</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#fff8e8">📦</div>
+            <div class="sub-info">
+              <div class="sub-name">Amazon Prime</div>
+              <div class="sub-detail">E-commerce · Livraison + vidéo</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">6,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-active">Actif</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-card" onclick="goTo('screen-detail-gym')">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#fde8ff">🏋️</div>
+            <div class="sub-info">
+              <div class="sub-name">Basic-Fit</div>
+              <div class="sub-detail">Sport · Inutilisé depuis 3 mois</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">29,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-unused">Inutilisé</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#e8f8ff">🌩️</div>
+            <div class="sub-info">
+              <div class="sub-name">iCloud+</div>
+              <div class="sub-detail">Stockage · 200 Go</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">2,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-active">Actif</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#fff0e8">📰</div>
+            <div class="sub-info">
+              <div class="sub-name">Le Monde</div>
+              <div class="sub-detail">Presse · Numérique</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">9,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-active">Actif</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-inner">
+            <div class="sub-logo" style="background:#f0ffe8">💪</div>
+            <div class="sub-info">
+              <div class="sub-name">MyCoach</div>
+              <div class="sub-detail">Sport · Application coaching</div>
+            </div>
+            <div class="sub-right">
+              <div class="sub-price">19,99 €</div>
+              <div class="sub-freq">/mois</div>
+              <div class="sub-tag tag-unused">Inutilisé</div>
+            </div>
+          </div>
+        </div>
+        <div style="height:16px"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" onclick="goTo('screen-home')"><div class="tab-icon">🏠</div><span>Accueil</span></div>
+        <div class="tab"><div class="tab-icon">💳</div><span>Cartes</span></div>
+        <div class="tab active"><div class="tab-icon">📋</div><span>Abonnements</span></div>
+        <div class="tab"><div class="tab-icon">📊</div><span>Budget</span></div>
+        <div class="tab"><div class="tab-icon">👤</div><span>Profil</span></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 3 : Netflix detail ════ -->
+    <div class="screen" id="screen-detail-netflix">
+      <div class="status-bar">
+        <span>9:43</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-back" onclick="goTo('screen-subs')">←</div>
+        <div class="topbar-title">Détail abonnement</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="scroll">
+        <div class="detail-hero">
+          <div class="detail-logo-big" style="background:#ffe8e8">🎬</div>
+          <div class="detail-name">Netflix</div>
+          <div class="detail-price">17,99 €</div>
+          <div class="detail-billing">Prélevé chaque mois · Prochain : 8 juin</div>
+        </div>
+        <div class="detail-stats">
+          <div class="detail-stat">
+            <div class="detail-stat-value">14 mois</div>
+            <div class="detail-stat-label">Ancienneté</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-value">251,86 €</div>
+            <div class="detail-stat-label">Total payé</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-value">Standard</div>
+            <div class="detail-stat-label">Formule</div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title">Informations</div>
+          <div class="detail-row">
+            <span class="detail-row-label">Prochain prélèvement</span>
+            <span class="detail-row-value">8 juin 2025</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Mode de paiement</span>
+            <span class="detail-row-value">•••• 4821</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Catégorie</span>
+            <span class="detail-row-value">Streaming vidéo</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Statut</span>
+            <span class="detail-row-value" style="color:#1a7a3a">● Actif</span>
+          </div>
+        </div>
+        <div class="action-btn btn-secondary">Changer de formule</div>
+        <div class="action-btn btn-cancel" onclick="goTo('screen-cancel-netflix')">Résilier Netflix</div>
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 4 : Basic-Fit detail ════ -->
+    <div class="screen" id="screen-detail-gym">
+      <div class="status-bar">
+        <span>9:44</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-back" onclick="goTo('screen-subs')">←</div>
+        <div class="topbar-title">Détail abonnement</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="scroll">
+        <div class="detail-hero">
+          <div class="detail-logo-big" style="background:#fde8ff">🏋️</div>
+          <div class="detail-name">Basic-Fit</div>
+          <div class="detail-price">29,99 €</div>
+          <div class="detail-billing">Prélevé chaque mois · Prochain : 1 juin</div>
+        </div>
+        <div style="margin:12px 16px; background:#fff8e1; border:1px solid #f6c90e; border-radius:12px; padding:14px; font-size:13px; color:#7a5c00;">
+          💤 <strong>Vous n'avez pas utilisé cet abonnement depuis 3 mois.</strong><br>
+          <span style="font-size:12px;color:#a07000;margin-top:4px;display:block">Économie potentielle : 89,97 € sur 3 mois</span>
+        </div>
+        <div class="detail-stats">
+          <div class="detail-stat">
+            <div class="detail-stat-value">8 mois</div>
+            <div class="detail-stat-label">Ancienneté</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-value">239,92 €</div>
+            <div class="detail-stat-label">Total payé</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-value">Classic</div>
+            <div class="detail-stat-label">Formule</div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title">Informations</div>
+          <div class="detail-row">
+            <span class="detail-row-label">Prochain prélèvement</span>
+            <span class="detail-row-value">1 juin 2025</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Dernière utilisation</span>
+            <span class="detail-row-value" style="color:#e53e3e">Il y a 3 mois</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">Statut</span>
+            <span class="detail-row-value" style="color:#d97706">● Inutilisé</span>
+          </div>
+        </div>
+        <div class="action-btn btn-cancel" onclick="goTo('screen-cancel-gym')">Résilier Basic-Fit</div>
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 5 : Canal+ detail ════ -->
+    <div class="screen" id="screen-detail-canal">
+      <div class="status-bar">
+        <span>9:44</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-back" onclick="goTo('screen-subs')">←</div>
+        <div class="topbar-title">Détail abonnement</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="scroll">
+        <div class="detail-hero">
+          <div class="detail-logo-big" style="background:#e8f0fe">📺</div>
+          <div class="detail-name">Canal+</div>
+          <div class="detail-price">26,99 €</div>
+          <div class="detail-billing">Prélevé chaque mois · Prochain : 15 juin</div>
+        </div>
+        <div style="margin:12px 16px; background:#fff8e1; border:1px solid #f6c90e; border-radius:12px; padding:14px; font-size:13px; color:#7a5c00;">
+          ⚠️ <strong>Hausse de prix détectée</strong><br>
+          <span style="font-size:12px;color:#a07000;margin-top:4px;display:block">Canal+ a augmenté de 23,99 € à 26,99 € ce mois. Soit +36 €/an.</span>
+        </div>
+        <div class="detail-stats">
+          <div class="detail-stat">
+            <div class="detail-stat-value">23 mois</div>
+            <div class="detail-stat-label">Ancienneté</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-value">579,77 €</div>
+            <div class="detail-stat-label">Total payé</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-value">Ciné+</div>
+            <div class="detail-stat-label">Option</div>
+          </div>
+        </div>
+        <div class="action-btn btn-secondary">Contester la hausse</div>
+        <div class="action-btn btn-cancel" onclick="goTo('screen-cancel-canal')">Résilier Canal+</div>
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 6 : Cancel confirm (Netflix) ════ -->
+    <div class="screen" id="screen-cancel-netflix">
+      <div class="status-bar">
+        <span>9:45</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-back" onclick="goTo('screen-detail-netflix')">←</div>
+        <div class="topbar-title">Confirmer la résiliation</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="scroll">
+        <div class="cancel-illustration">
+          <span class="cancel-emoji">📋</span>
+          <div class="cancel-title">Résilier Netflix ?</div>
+          <div class="cancel-sub">papernest s'occupe de tout.<br>La résiliation sera effective à la fin de la période en cours.</div>
+        </div>
+        <div class="cancel-summary">
+          <div class="cancel-row">
+            <span class="cancel-row-label">Abonnement</span>
+            <span class="cancel-row-value">Netflix Standard</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Dernier prélèvement</span>
+            <span class="cancel-row-value">8 juin 2025</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Économie annuelle</span>
+            <span class="cancel-row-value" style="color:#1a7a3a">+ 215,88 €</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Géré par</span>
+            <span class="cancel-row-value">papernest ×  Boursorama</span>
+          </div>
+        </div>
+        <div class="action-btn btn-primary" onclick="goTo('screen-success-netflix')">Confirmer la résiliation</div>
+        <div class="action-btn btn-secondary" onclick="goTo('screen-subs')">Annuler</div>
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 7 : Cancel confirm (Basic-Fit) ════ -->
+    <div class="screen" id="screen-cancel-gym">
+      <div class="status-bar">
+        <span>9:45</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-back" onclick="goTo('screen-detail-gym')">←</div>
+        <div class="topbar-title">Confirmer la résiliation</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="scroll">
+        <div class="cancel-illustration">
+          <span class="cancel-emoji">📋</span>
+          <div class="cancel-title">Résilier Basic-Fit ?</div>
+          <div class="cancel-sub">papernest envoie votre demande de résiliation directement à Basic-Fit.</div>
+        </div>
+        <div class="cancel-summary">
+          <div class="cancel-row">
+            <span class="cancel-row-label">Abonnement</span>
+            <span class="cancel-row-value">Basic-Fit Classic</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Dernier prélèvement</span>
+            <span class="cancel-row-value">1 juin 2025</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Économie annuelle</span>
+            <span class="cancel-row-value" style="color:#1a7a3a">+ 359,88 €</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Géré par</span>
+            <span class="cancel-row-value">papernest × Boursorama</span>
+          </div>
+        </div>
+        <div class="action-btn btn-primary" onclick="goTo('screen-success-gym')">Confirmer la résiliation</div>
+        <div class="action-btn btn-secondary" onclick="goTo('screen-subs')">Annuler</div>
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 8 : Cancel confirm (Canal+) ════ -->
+    <div class="screen" id="screen-cancel-canal">
+      <div class="status-bar">
+        <span>9:46</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="topbar">
+        <div class="topbar-back" onclick="goTo('screen-detail-canal')">←</div>
+        <div class="topbar-title">Confirmer la résiliation</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="scroll">
+        <div class="cancel-illustration">
+          <span class="cancel-emoji">📋</span>
+          <div class="cancel-title">Résilier Canal+ ?</div>
+          <div class="cancel-sub">Suite à la hausse de prix, vous pouvez résilier sans frais.</div>
+        </div>
+        <div class="cancel-summary">
+          <div class="cancel-row">
+            <span class="cancel-row-label">Abonnement</span>
+            <span class="cancel-row-value">Canal+ Ciné+</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Motif</span>
+            <span class="cancel-row-value">Hausse de prix</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Économie annuelle</span>
+            <span class="cancel-row-value" style="color:#1a7a3a">+ 323,88 €</span>
+          </div>
+          <div class="cancel-row">
+            <span class="cancel-row-label">Géré par</span>
+            <span class="cancel-row-value">papernest × Boursorama</span>
+          </div>
+        </div>
+        <div class="action-btn btn-primary" onclick="goTo('screen-success-canal')">Confirmer la résiliation</div>
+        <div class="action-btn btn-secondary" onclick="goTo('screen-subs')">Annuler</div>
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 9 : Success Netflix ════ -->
+    <div class="screen" id="screen-success-netflix">
+      <div class="status-bar">
+        <span>9:45</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div class="success-wrap">
+          <div class="success-circle">✓</div>
+          <div class="success-title">Résiliation envoyée !</div>
+          <div class="success-sub">papernest a transmis votre demande à Netflix. Vous recevrez une confirmation par email sous 24h.</div>
+          <div class="success-saving">
+            <div class="success-saving-label">Vous économisez</div>
+            <div class="success-saving-amount">215,88 €/an</div>
+            <div class="success-saving-sub">grâce à Boursorama × papernest</div>
+          </div>
+          <div class="action-btn btn-primary" style="width:100%;margin:0" onclick="goTo('screen-subs')">Retour à mes abonnements</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 10 : Success Gym ════ -->
+    <div class="screen" id="screen-success-gym">
+      <div class="status-bar">
+        <span>9:45</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div class="success-wrap">
+          <div class="success-circle">✓</div>
+          <div class="success-title">Résiliation envoyée !</div>
+          <div class="success-sub">papernest a transmis votre demande à Basic-Fit. Confirmation sous 24h.</div>
+          <div class="success-saving">
+            <div class="success-saving-label">Vous économisez</div>
+            <div class="success-saving-amount">359,88 €/an</div>
+            <div class="success-saving-sub">grâce à Boursorama × papernest</div>
+          </div>
+          <div class="action-btn btn-primary" style="width:100%;margin:0" onclick="goTo('screen-subs')">Retour à mes abonnements</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SCREEN 11 : Success Canal+ ════ -->
+    <div class="screen" id="screen-success-canal">
+      <div class="status-bar">
+        <span>9:46</span>
+        <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div class="success-wrap">
+          <div class="success-circle">✓</div>
+          <div class="success-title">Résiliation envoyée !</div>
+          <div class="success-sub">papernest a transmis votre demande à Canal+. Sans frais grâce à la hausse de prix.</div>
+          <div class="success-saving">
+            <div class="success-saving-label">Vous économisez</div>
+            <div class="success-saving-amount">323,88 €/an</div>
+            <div class="success-saving-sub">grâce à Boursorama × papernest</div>
+          </div>
+          <div class="action-btn btn-primary" style="width:100%;margin:0" onclick="goTo('screen-subs')">Retour à mes abonnements</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+
+  <!-- ══════════════════════ GUIDE ══════════════════════ -->
+  <div class="guide">
+    <div class="guide-title">Parcours utilisateur</div>
+    <div class="guide-step" id="step-1">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <div class="step-label">Découverte</div>
+        <div class="step-desc">Sophie voit le module papernest sur l'accueil Boursorama. Elle réalise qu'elle dépense 124 €/mois.</div>
+      </div>
+    </div>
+    <div class="guide-step" id="step-2">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <div class="step-label">Vue d'ensemble</div>
+        <div class="step-desc">Elle voit tous ses abonnements détectés automatiquement depuis ses transactions. Alerte prix sur Canal+.</div>
+      </div>
+    </div>
+    <div class="guide-step" id="step-3">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <div class="step-label">Analyse</div>
+        <div class="step-desc">Elle clique sur Basic-Fit : inutilisé depuis 3 mois, 29,99 €/mois. papernest lui propose de résilier.</div>
+      </div>
+    </div>
+    <div class="guide-step" id="step-4">
+      <div class="step-num">4</div>
+      <div class="step-text">
+        <div class="step-label">Action : résiliation</div>
+        <div class="step-desc">2 clics suffisent. papernest gère la démarche complète en arrière-plan.</div>
+      </div>
+    </div>
+    <div class="guide-step" id="step-5">
+      <div class="step-num">5</div>
+      <div class="step-text">
+        <div class="step-label">Confirmation</div>
+        <div class="step-desc">Sophie économise 359 €/an sans avoir quitté son application bancaire.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid #222">
+      <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Ce prototype démontre</div>
+      <div style="font-size:12px;color:#888;line-height:1.8">
+        ✓ Détection auto des abonnements<br>
+        ✓ Alertes hausse de prix<br>
+        ✓ Résiliation en 2 clics<br>
+        ✓ Zéro friction pour l'utilisateur<br>
+        ✓ 100% dans l'app bancaire
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const screenStepMap = {
+  'screen-home': 1,
+  'screen-subs': 2,
+  'screen-detail-netflix': 3,
+  'screen-detail-gym': 3,
+  'screen-detail-canal': 3,
+  'screen-cancel-netflix': 4,
+  'screen-cancel-gym': 4,
+  'screen-cancel-canal': 4,
+  'screen-success-netflix': 5,
+  'screen-success-gym': 5,
+  'screen-success-canal': 5,
+};
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const step = screenStepMap[id] || 1;
+  setStep(step);
+}
+
+function setStep(n) {
+  document.querySelectorAll('.guide-step').forEach((el, i) => {
+    el.classList.remove('active','done');
+    if (i + 1 < n) el.classList.add('done');
+    else if (i + 1 === n) el.classList.add('active');
+  });
+}
+
+setStep(1);
+</script>
+</body>
+</html>
