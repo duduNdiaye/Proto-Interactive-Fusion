@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maiia BO — Modification du centre</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal: #00a99d;
+  --teal-dark: #008c82;
+  --teal-light: #e8f7f6;
+  --pink: #e91e8c;
+  --pink-dark: #c4177a;
+  --red: #d32f2f;
+  --bg: #f4f5f7;
+  --surface: #fff;
+  --ink: #1f2937;
+  --ink2: #374151;
+  --muted: #6b7280;
+  --muted2: #9ca3af;
+  --border: #e5e7eb;
+  --border2: #d1d5db;
+  --orange: #d97706;
+  --orange-bg: #fffbeb;
+  --orange-border: #fde68a;
+  --green: #16a34a;
+  --sidebar-w: 228px;
+  --top-h: 52px;
+}
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink2); font-size: 13.5px; }
+
+/* TOPBAR */
+.topbar { height: var(--top-h); background: var(--teal); display: flex; align-items: center; padding: 0 18px; gap: 12px; position: fixed; inset: 0 0 auto 0; z-index: 300; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.t-logo { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 5px; }
+.t-logo sup { font-size: 9px; background: rgba(255,255,255,.22); color: #fff; border-radius: 3px; padding: 1px 4px; font-weight: 700; }
+.t-sep { width: 1px; height: 18px; background: rgba(255,255,255,.25); }
+.t-title { font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,.95); }
+.t-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.t-env { background: rgba(0,0,0,.18); color: #fff; border-radius: 100px; padding: 4px 12px; font-size: 11.5px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.t-av { width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,.22); font-size: 9px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; }
+.t-user { font-size: 12.5px; color: rgba(255,255,255,.9); font-weight: 500; }
+
+/* LAYOUT */
+.layout { display: flex; height: 100vh; padding-top: var(--top-h); }
+
+/* SIDEBAR */
+.sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); position: fixed; top: var(--top-h); left: 0; bottom: 0; overflow-y: auto; z-index: 200; padding: 10px 0 20px; }
+.oneclick { margin: 8px 10px 10px; background: var(--pink); color: #fff; border: none; border-radius: 100px; padding: 8px 0; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; justify-content: center; width: calc(100% - 20px); }
+.n { display: flex; align-items: center; gap: 9px; padding: 8px 16px; font-size: 13px; color: var(--ink2); cursor: pointer; white-space: nowrap; }
+.n:hover { background: #f9fafb; }
+.n.on { background: var(--teal-light); color: var(--teal); font-weight: 500; }
+.n.on::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--teal); }
+.n { position: relative; }
+.n svg { width:15px; height:15px; flex-shrink:0; opacity:.55; stroke:currentColor; fill:none; stroke-width:2; }
+.n.on svg { opacity:1; }
+.chev { margin-left:auto; font-size:10px; color:var(--muted2); }
+
+/* CONTENT */
+.content { margin-left: var(--sidebar-w); flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+/* TABS */
+.tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; overflow-x:auto; scrollbar-width:none; flex-shrink:0; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab { padding: 14px 16px; font-size: 11.5px; font-weight: 500; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); cursor:pointer; border-bottom: 2px solid transparent; white-space:nowrap; transition:all .15s; }
+.tab:hover { color:var(--ink2); }
+.tab.on { color:var(--teal); border-bottom-color:var(--teal); }
+
+/* SCROLLER */
+.scroller { flex:1; overflow-y:auto; padding: 0 24px 100px; }
+
+/* BANDEAU ALERTE */
+.alert-banner { display: flex; align-items: center; gap: 8px; background: var(--orange-bg); border: 1px solid var(--orange-border); border-radius: 6px; padding: 10px 14px; margin: 18px 0 0; }
+.alert-banner-icon { font-size: 14px; flex-shrink: 0; }
+.alert-banner-text { font-size: 12.5px; color: #92400e; line-height: 1.4; }
+.alert-banner-link { color: var(--teal); font-weight: 600; text-decoration: none; cursor: pointer; margin-left: 6px; }
+.alert-banner-link:hover { text-decoration: underline; }
+
+/* SECTION CARD */
+.sc { background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:14px; overflow: visible; margin-top: 14px; }
+.sc:first-of-type { margin-top: 18px; }
+.sc-head { display:flex; align-items:center; gap:10px; padding:13px 20px; border-bottom:1px solid var(--border); }
+.sc-num { width:24px; height:24px; border-radius:50%; background:var(--teal); color:#fff; font-size:11.5px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sc-num.new { background: var(--pink); }
+.sc-title { font-size:13px; font-weight:600; color:var(--ink); }
+.sc-badge { font-size:10px; font-weight:700; background:var(--pink); color:#fff; padding:2px 8px; border-radius:100px; margin-left:4px; }
+.sc-body { padding:22px 20px; overflow: visible; }
+
+/* FIELDS */
+.f { margin-bottom:18px; }
+.f:last-child { margin-bottom:0; }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
+.lbl { display:block; font-size:11px; font-weight:500; color:var(--muted); margin-bottom:5px; }
+.lbl .req { color:var(--teal); }
+input[type=text], input[type=number], select {
+  width:100%; border:none; border-bottom:1px solid var(--border2);
+  background:transparent; padding:6px 0 5px; font-family:'Inter',sans-serif;
+  font-size:13.5px; color:var(--ink); outline:none; transition:border-color .15s;
+}
+input:focus, select:focus { border-bottom-color:var(--teal); }
+select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ca3af'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 2px center; padding-right:18px; cursor:pointer; appearance:none; }
+
+/* TOGGLES */
+.tog-row { display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid #f3f4f6; }
+.tog-row:last-child { border-bottom:none; }
+.tog-lbl { font-size:13.5px; color:var(--ink2); }
+.sw { position:relative; width:44px; height:24px; flex-shrink:0; }
+.sw input { opacity:0; width:0; height:0; }
+.sw-t { position:absolute; inset:0; background:#d1d5db; border-radius:100px; cursor:pointer; transition:background .2s; }
+.sw-t::before { content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:#fff; top:3px; left:3px; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.sw input:checked + .sw-t { background:var(--pink); }
+.sw input:checked + .sw-t::before { transform:translateX(20px); }
+
+/* MAP */
+.addr-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
+.map-box { border:1px solid var(--border); border-radius:6px; overflow:hidden; height:240px; background:#e8efe0; }
+
+/* HIER */
+.hier-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
+.hier-node { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:7px; margin-bottom:6px; background:var(--surface); }
+.h-icon { width:32px; height:32px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; }
+.h-node-info { flex:1; }
+.h-node-name { font-size:13px; font-weight:600; color:var(--ink); }
+.h-node-sub { font-size:11.5px; color:var(--muted); }
+.hier-tabs { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:12px; }
+.h-tab { padding:8px 14px; font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; }
+.h-tab.on { color:var(--pink); border-bottom-color:var(--pink); }
+
+/* STRIPE CARD — fidèle composant existant */
+.stripe-card { border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; overflow: visible; }
+.stripe-card-title { font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.stripe-card-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+
+/* MULTI-SELECT */
+.ms-wrap { position: relative; }
+.ms-trigger { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border2); border-radius: 4px; padding: 9px 12px; cursor: pointer; background: var(--surface); transition: border-color .15s; }
+.ms-trigger:hover { border-color: var(--teal); }
+.ms-trigger.open { border-color: var(--teal); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+#ms-placeholder { font-size: 13px; color: var(--muted2); }
+.ms-chevron { font-size: 12px; color: var(--muted2); transition: transform .2s; }
+.ms-chevron.up { transform: rotate(180deg); }
+.ms-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid var(--teal); border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 12px rgba(0,0,0,.12); z-index: 400; max-height: 220px; overflow-y: auto; }
+.ms-search-row { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.ms-search-row input { width: 100%; border: none; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; color: var(--ink2); background: transparent; }
+.ms-search-row input::placeholder { color: var(--muted2); }
+.ms-option { display: flex; align-items: center; gap: 10px; padding: 9px 14px; cursor: pointer; transition: background .1s; border-bottom: 1px solid #f9fafb; }
+.ms-option:last-child { border-bottom: none; }
+.ms-option:hover { background: var(--teal-light); }
+.ms-option input[type=checkbox] { accent-color: var(--teal); width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; }
+.ms-option-info { flex: 1; }
+.ms-option-name { font-size: 13px; color: var(--ink2); font-weight: 500; }
+.ms-option-role { font-size: 11.5px; color: var(--muted); }
+.ms-selected-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
+.ms-tag { display: flex; align-items: center; gap: 6px; background: var(--teal-light); color: var(--teal); border-radius: 100px; padding: 4px 10px; font-size: 12px; font-weight: 500; }
+.ms-tag-x { cursor: pointer; font-size: 15px; color: var(--teal); line-height: 1; opacity: .7; }
+.ms-tag-x:hover { opacity: 1; }
+.ms-empty { padding: 14px; font-size: 12.5px; color: var(--muted2); font-style: italic; }
+
+/* LGC cards */
+.lgc-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.lgc-card { border:1.5px solid var(--border); border-radius:10px; padding:16px 18px; cursor:pointer; background:var(--surface); transition:border-color .2s; }
+.lgc-card:hover { border-color:var(--teal); }
+.lgc-card.sel { border-color:var(--teal); background:#f0fdfa; }
+.lgc-card-top { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.lgc-radio-dot { width:16px; height:16px; border-radius:50%; border:2px solid var(--border2); flex-shrink:0; background:#fff; }
+.lgc-card.sel .lgc-radio-dot { border-color:var(--teal); background:var(--teal); }
+.lgc-title { font-size:13px; font-weight:700; color:var(--ink); }
+.lgc-subtitle { font-size:11.5px; color:var(--muted); }
+.lgc-note { font-size:12.5px; color:var(--muted); margin-bottom:16px; }
+.lgc-note strong { color:var(--ink2); }
+
+/* ACTIONS BAR */
+.actions-bar { position:fixed; bottom:0; left:var(--sidebar-w); right:0; background:var(--surface); border-top:1px solid var(--border); padding:12px 24px; display:flex; justify-content:flex-end; gap:10px; z-index:250; }
+.btn-ann { padding:8px 22px; border:1px solid var(--border2); border-radius:7px; background:var(--surface); color:var(--muted); font-family:'Inter',sans-serif; font-size:13px; font-weight:500; cursor:pointer; }
+.btn-ann:hover { border-color:var(--ink2); color:var(--ink2); }
+.btn-save { padding:8px 26px; border:none; border-radius:7px; background:var(--teal); color:#fff; font-family:'Inter',sans-serif; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-save:hover { background:var(--teal-dark); }
+
+/* TOAST */
+.toasts { position:fixed; top:62px; right:16px; z-index:600; display:flex; flex-direction:column; gap:7px; pointer-events:none; }
+.toast { background:var(--ink); color:#fff; padding:11px 16px; border-radius:8px; font-size:12.5px; display:flex; align-items:center; gap:9px; box-shadow:0 4px 16px rgba(0,0,0,.18); max-width:340px; pointer-events:all; }
+.toast.ok { background:#15803d; }
+.toast.er { background:var(--red); }
+.toast-x { margin-left:auto; background:none; border:none; color:rgba(255,255,255,.7); cursor:pointer; font-size:15px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="t-logo">Maiia<sup>BO</sup></div>
+  <div class="t-sep"></div>
+  <div class="t-title">Modification du centre — Centre Pape</div>
+  <div class="t-right">
+    <div class="t-env"><div class="t-av">A</div>BackOffice Maiia</div>
+    <div class="t-user">NDIAYE Pape Amadou Dieye</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <button class="oneclick">✋ OneClick creation</button>
+    <div class="n on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Centres</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Praticiens</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Utilisateurs</div>
+    <div class="n"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Offres</div>
+    <div class="n"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>TLC assistée</div>
+    <div class="n"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Coordinations<span class="chev">▾</span></div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Journal</div>
+    <div class="n"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Mutuelles / Caisses<span class="chev">▾</span></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab on" onclick="switchTab(this)">Paramètres Globaux</div>
+      <div class="tab" onclick="switchTab(this)">Stripe</div>
+      <div class="tab" onclick="switchTab(this)">Référent</div>
+      <div class="tab" onclick="switchTab(this)">Utilisateurs (4)</div>
+      <div class="tab" onclick="switchTab(this)">Praticiens (4)</div>
+      <div class="tab" onclick="switchTab(this)">TLC Assistée</div>
+      <div class="tab" onclick="switchTab(this)">Fonctionnalités</div>
+      <div class="tab" onclick="switchTab(this)">Hiérarchie</div>
+      <div class="tab" onclick="switchTab(this)">Journal</div>
+      <div class="tab" onclick="switchTab(this)">Statistiques</div>
+    </div>
+
+    <div class="scroller">
+
+      <!-- BANDEAU ALERTE — visible si offre TLC payante + aucun gestionnaire -->
+      <div class="alert-banner" id="alert-banner">
+        <div class="alert-banner-icon">⚠️</div>
+        <div class="alert-banner-body">
+          <div class="alert-banner-text">
+            Offre TLC payante active — aucun gestionnaire Stripe Centre défini.
+            <span class="alert-banner-link" onclick="scrollToStripe()">Configurer →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- S1 — IDENTIFICATION -->
+      <div class="sc">
+        <div class="sc-head">
+          <div class="sc-num">1</div>
+          <div class="sc-title">Identification du centre</div>
+        </div>
+        <div class="sc-body">
+          <div class="g3 f">
+            <div class="f">
+              <label class="lbl">Nom du centre <span class="req">*</span></label>
+              <input type="text" value="Centre Pape">
+            </div>
+            <div class="f">
+              <label class="lbl">N° ERP structure <span class="req">*</span></label>
+              <input type="text" value="S001691426">
+            </div>
+            <div class="f">
+              <label class="lbl">Type de centre</label>
+              <input type="text" value="Cabinet médical">
+            </div>
+          </div>
+          <div class="g2">
+            <div class="f">
+              <label class="lbl">N° FINESS</label>
+              <input type="text" placeholder="750100208">
+            </div>
+            <div class="f">
+              <label class="lbl">N° SIRET</label>
+              <input type="text" placeholder="45050175400045">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S2 — VISIBILITE -->
+      <div class="sc">
+        <div class="sc-head">
+          <div class="sc-num">2</div>
+          <div class="sc-title">Visibilité &amp; statut</div>
+        </div>
+        <div class="sc-body">
+          <div class="tog-row"><label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label><span class="tog-lbl">Centre visible en ligne</span></div>
+          <div class="tog-row"><label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label><span class="tog-lbl">Afficher l'adresse/horaires du centre sur www.maiia.com</span></div>
+          <div class="tog-row"><label class="sw"><input type="checkbox"><span class="sw-t"></span></label><span class="tog-lbl">Centre secret</span></div>
+          <div class="tog-row"><label class="sw"><input type="checkbox"><span class="sw-t"></span></label><span class="tog-lbl">Démo</span></div>
+          <div class="tog-row"><label class="sw"><input type="checkbox"><span class="sw-t"></span></label><span class="tog-lbl">Modèle de centre</span></div>
+        </div>
+      </div>
+
+      <!-- S3 — CONTACT & ADRESSE -->
+      <div class="sc">
+        <div class="sc-head">
+          <div class="sc-num">3</div>
+          <div class="sc-title">Contact &amp; adresse</div>
+        </div>
+        <div class="sc-body">
+          <div class="f" style="max-width:340px;">
+            <label class="lbl">Téléphone</label>
+            <input type="text" placeholder="01 02 03 04 05">
+          </div>
+          <div class="addr-layout">
+            <div>
+              <div class="f">
+                <label class="lbl">Adresse complète</label>
+                <input type="text" value="10 Rue Marie Curie 10000 Troyes">
+              </div>
+              <div class="g2 f">
+                <div class="f"><label class="lbl">Code postal <span class="req">*</span></label><input type="text" value="10000"></div>
+                <div class="f"><label class="lbl">Ville <span class="req">*</span></label><input type="text" value="Troyes"></div>
+              </div>
+              <div class="f">
+                <label class="lbl">Fuseau horaire <span class="req">*</span></label>
+                <select><option>(GMT+01:00) Heure d'Europe centrale – Paris</option></select>
+              </div>
+            </div>
+            <div>
+              <div class="map-box">
+                <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="400" height="240" fill="#e8efe0"/>
+                  <defs><pattern id="mg" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0L0 0 0 25" fill="none" stroke="#dce8d4" stroke-width=".4"/></pattern></defs>
+                  <rect width="400" height="240" fill="url(#mg)"/>
+                  <rect x="10" y="10" width="70" height="50" rx="2" fill="#d4e4c4" stroke="#b8d0a8" stroke-width=".7"/>
+                  <rect x="100" y="5" width="55" height="35" rx="2" fill="#c8dcc8" stroke="#a8c4a8" stroke-width=".7"/>
+                  <rect x="170" y="20" width="80" height="45" rx="2" fill="#d0e0c8" stroke="#b0cca8" stroke-width=".7"/>
+                  <rect x="280" y="10" width="60" height="55" rx="2" fill="#ccdcc4" stroke="#a8c8a4" stroke-width=".7"/>
+                  <rect x="0" y="90" width="400" height="30" fill="#f0e8a0"/>
+                  <rect x="130" y="0" width="22" height="240" fill="#f4f0e0"/>
+                  <path d="M200 90 C190 90 182 98 182 108 C182 122 200 136 200 136 C200 136 218 122 218 108 C218 98 210 90 200 90z" fill="var(--teal)"/>
+                  <circle cx="200" cy="108" r="5" fill="white"/>
+                  <rect x="8" y="8" width="20" height="20" rx="3" fill="rgba(255,255,255,.9)" stroke="#ddd" stroke-width=".5"/>
+                  <text x="18" y="22" text-anchor="middle" font-size="13" fill="#555" font-weight="600">+</text>
+                  <rect x="8" y="30" width="20" height="20" rx="3" fill="rgba(255,255,255,.9)" stroke="#ddd" stroke-width=".5"/>
+                  <line x1="12" y1="40" x2="24" y2="40" stroke="#555" stroke-width="1.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S4 — HIERARCHIE -->
+      <div class="sc">
+        <div class="sc-head">
+          <div class="sc-num">4</div>
+          <div class="sc-title">Hiérarchie</div>
+        </div>
+        <div class="sc-body">
+          <div class="hier-layout">
+            <div>
+              <div class="f">
+                <label class="lbl">Centre père</label>
+                <select><option value="">— Rechercher un centre —</option><option>Centre Référent SNCF</option><option>Groupe Santé Paris Nord</option></select>
+              </div>
+              <div class="tog-row f" style="border-bottom:none; padding:8px 0;">
+                <label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label>
+                <span class="tog-lbl">Uniquement centre sans praticiens</span>
+              </div>
+            </div>
+            <div>
+              <div class="hier-tabs">
+                <div class="h-tab on">Vue Liste</div>
+                <div class="h-tab">Vue Arbre</div>
+              </div>
+              <div class="hier-node" style="background:#f0fdfa; border-color:var(--teal);">
+                <div class="h-icon" style="background:var(--teal-light);">🏥</div>
+                <div class="h-node-info">
+                  <div class="h-node-name" style="color:var(--teal);">Centre Pape</div>
+                  <div class="h-node-sub">Centre courant</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S5 — ACCES CONFIGURATION STRIPE (NOUVEAU) -->
+      <div class="sc" id="stripe-section">
+        <div class="sc-head">
+          <div class="sc-num new">5</div>
+          <div class="sc-title">Accès Configuration Stripe</div>
+          <span class="sc-badge">NOUVEAU</span>
+        </div>
+        <div class="sc-body">
+
+          <!-- Composant fidèle à la capture -->
+          <div class="stripe-card">
+            <div class="stripe-card-title">ACCÈS CONFIGURATION STRIPE</div>
+            <div class="stripe-card-desc">Les utilisateurs sélectionnés sont désignés comme responsables de la configuration du compte Stripe.</div>
+            <div class="ms-wrap" id="ms-wrap">
+              <div class="ms-trigger" id="ms-trigger" onclick="openDropdown()">
+                <span id="ms-placeholder">Rechercher un utilisateur...</span>
+                <span class="ms-chevron" id="ms-chevron">▾</span>
+              </div>
+              <div class="ms-dropdown" id="ms-dropdown" style="display:none;">
+                <div class="ms-search-row">
+                  <input type="text" id="ms-input" placeholder="Rechercher..." oninput="filterUsers(this.value)" onclick="event.stopPropagation()">
+                </div>
+                <div class="ms-option" onclick="toggleUser(this, 'CARDHCDTEST SansCpsID', 'Praticien')">
+                  <input type="checkbox" onclick="event.stopPropagation()">
+                  <div class="ms-option-info">
+                    <div class="ms-option-name">CARDHCDTEST SansCpsID</div>
+                    <div class="ms-option-role">Praticien</div>
+                  </div>
+                </div>
+                <div class="ms-option" onclick="toggleUser(this, 'CARDHCDTEST2 CpsIdNull', 'Praticien')">
+                  <input type="checkbox" onclick="event.stopPropagation()">
+                  <div class="ms-option-info">
+                    <div class="ms-option-name">CARDHCDTEST2 CpsIdNull</div>
+                    <div class="ms-option-role">Praticien</div>
+                  </div>
+                </div>
+                <div class="ms-option" onclick="toggleUser(this, 'NDIAYE Pape Amadou Dieye', 'Praticien')">
+                  <input type="checkbox" onclick="event.stopPropagation()">
+                  <div class="ms-option-info">
+                    <div class="ms-option-name">NDIAYE Pape Amadou Dieye</div>
+                    <div class="ms-option-role">Praticien</div>
+                  </div>
+                </div>
+                <div class="ms-option" onclick="toggleUser(this, 'NEW PS_SANS_RPPS', 'Praticien')">
+                  <input type="checkbox" onclick="event.stopPropagation()">
+                  <div class="ms-option-info">
+                    <div class="ms-option-name">NEW PS_SANS_RPPS</div>
+                    <div class="ms-option-role">Praticien</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ms-selected-tags" id="ms-tags"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- S6 — CONFIG LGC -->
+      <div class="sc">
+        <div class="sc-head">
+          <div class="sc-num">6</div>
+          <div class="sc-title">Configuration LGC</div>
+        </div>
+        <div class="sc-body">
+          <p class="lgc-note">Sélectionnez la configuration LGC à activer. Ces configurations sont <strong>irréversibles</strong>.</p>
+          <div class="lgc-grid">
+            <div class="lgc-card" onclick="this.classList.toggle('sel')">
+              <div class="lgc-card-top">
+                <div class="lgc-radio-dot"></div>
+                <span style="font-size:18px;">🩺</span>
+                <span class="lgc-title">Maiia Médecin</span>
+              </div>
+              <div class="lgc-subtitle">LGC Médecin - Services Maiia</div>
+            </div>
+            <div class="lgc-card" style="opacity:0.5; pointer-events:none;">
+              <div class="lgc-card-top">
+                <div class="lgc-radio-dot"></div>
+                <span style="font-size:18px;">🏥</span>
+                <span class="lgc-title">Maiia CDS</span>
+                <span style="font-size:10px;font-weight:600;background:#f3f4f6;color:var(--muted2);padding:2px 8px;border-radius:100px;margin-left:auto;">Prochainement</span>
+              </div>
+              <div class="lgc-subtitle">LGC Centre de Santé</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIONS BAR -->
+<div class="actions-bar">
+  <button class="btn-ann">Annuler</button>
+  <button class="btn-save" onclick="doSave()">Enregistrer</button>
+</div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<script>
+// TABS
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+  t.classList.add('on');
+}
+
+// TOAST
+function toast(msg, type) {
+  const c = document.getElementById('toasts');
+  const d = document.createElement('div');
+  d.className = 'toast ' + (type || 'ok');
+  d.innerHTML = `<span>${type === 'er' ? '✗' : '✓'}</span>${msg}<button class="toast-x" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(d);
+  setTimeout(() => d.remove(), 4000);
+}
+
+// DROPDOWN OPEN/CLOSE
+let dropdownOpen = false;
+
+function openDropdown() {
+  dropdownOpen = !dropdownOpen;
+  const dd = document.getElementById('ms-dropdown');
+  const trigger = document.getElementById('ms-trigger');
+  const chev = document.getElementById('ms-chevron');
+  dd.style.display = dropdownOpen ? 'block' : 'none';
+  trigger.classList.toggle('open', dropdownOpen);
+  chev.classList.toggle('up', dropdownOpen);
+  if (dropdownOpen) document.getElementById('ms-input').focus();
+}
+
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('ms-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('ms-dropdown').style.display = 'none';
+    document.getElementById('ms-trigger').classList.remove('open');
+    document.getElementById('ms-chevron').classList.remove('up');
+    dropdownOpen = false;
+  }
+});
+
+// MULTI-SELECT USERS
+const selectedUsers = new Set();
+
+function toggleUser(row, name, role) {
+  const cb = row.querySelector('input[type=checkbox]');
+  if (selectedUsers.has(name)) {
+    selectedUsers.delete(name);
+    cb.checked = false;
+    row.style.background = '';
+  } else {
+    selectedUsers.add(name);
+    cb.checked = true;
+    row.style.background = 'var(--teal-light)';
+  }
+  renderTags();
+  checkBanner();
+}
+
+function renderTags() {
+  const container = document.getElementById('ms-tags');
+  container.innerHTML = '';
+  selectedUsers.forEach(name => {
+    const tag = document.createElement('div');
+    tag.className = 'ms-tag';
+    tag.innerHTML = `${name} <span class="ms-tag-x" onclick="removeUser('${name}')">×</span>`;
+    container.appendChild(tag);
+  });
+}
+
+function removeUser(name) {
+  selectedUsers.delete(name);
+  // uncheck matching row
+  document.querySelectorAll('.ms-option').forEach(row => {
+    const n = row.querySelector('.ms-option-name').textContent;
+    if (n === name) {
+      row.querySelector('input').checked = false;
+      row.style.background = '';
+    }
+  });
+  renderTags();
+  checkBanner();
+}
+
+function filterUsers(q) {
+  const lq = q.toLowerCase();
+  document.querySelectorAll('.ms-option').forEach(row => {
+    const name = row.querySelector('.ms-option-name').textContent.toLowerCase();
+    row.style.display = name.includes(lq) ? '' : 'none';
+  });
+}
+
+function checkBanner() {
+  const banner = document.getElementById('alert-banner');
+  banner.style.display = selectedUsers.size > 0 ? 'none' : 'flex';
+}
+
+// SAVE
+function doSave() {
+  toast('Centre enregistré avec succès !', 'ok');
+}
+</script>
+</body>
+</html>
