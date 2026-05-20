@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maiia BO — Modification du centre — Onglet Stripe</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal: #00a99d; --teal-dark: #008c82; --teal-light: #e8f7f6;
+  --pink: #e91e8c; --pink-light: #fce4ec; --pink-soft: #f8a5c2;
+  --bg: #f4f5f7; --surface: #fff;
+  --ink: #1f2937; --ink2: #374151;
+  --muted: #6b7280; --muted2: #9ca3af;
+  --border: #e5e7eb; --border2: #d1d5db;
+  --orange: #d97706;
+  --sidebar-w: 228px; --top-h: 52px;
+}
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink2); font-size: 13.5px; }
+
+/* TOPBAR */
+.topbar { height: var(--top-h); background: var(--teal); display: flex; align-items: center; padding: 0 18px; gap: 12px; position: fixed; inset: 0 0 auto 0; z-index: 300; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.t-logo { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 5px; }
+.t-logo sup { font-size: 9px; background: rgba(255,255,255,.22); color: #fff; border-radius: 3px; padding: 1px 4px; font-weight: 700; }
+.t-sep { width: 1px; height: 18px; background: rgba(255,255,255,.25); }
+.t-title { font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,.95); }
+.t-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.t-env { background: rgba(0,0,0,.18); color: #fff; border-radius: 100px; padding: 4px 12px; font-size: 11.5px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.t-av { width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,.22); font-size: 9px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; }
+.t-user { font-size: 12.5px; color: rgba(255,255,255,.9); font-weight: 500; }
+
+/* LAYOUT */
+.layout { display: flex; height: 100vh; padding-top: var(--top-h); }
+
+/* SIDEBAR */
+.sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); position: fixed; top: var(--top-h); left: 0; bottom: 0; overflow-y: auto; z-index: 200; padding: 10px 0 20px; }
+.oneclick-btn { margin: 8px 10px 10px; background: var(--pink); color: #fff; border: none; border-radius: 100px; padding: 8px 0; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; justify-content: center; width: calc(100% - 20px); }
+.n { display: flex; align-items: center; gap: 9px; padding: 8px 16px; font-size: 13px; color: var(--ink2); cursor: pointer; white-space: nowrap; position: relative; }
+.n.on { background: var(--teal-light); color: var(--teal); font-weight: 500; }
+.n.on::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--teal); }
+.n svg { width:15px; height:15px; flex-shrink:0; opacity:.55; stroke:currentColor; fill:none; stroke-width:2; }
+.n.on svg { opacity:1; }
+.n:hover { background: #f9fafb; }
+
+/* CONTENT */
+.content { margin-left: var(--sidebar-w); flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+/* DEMO PANEL */
+.demo-panel { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 8px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #fcd34d; flex-shrink: 0; flex-wrap: wrap; }
+.demo-panel-label { font-size: 10.5px; font-weight: 700; color: #78350f; letter-spacing: .08em; text-transform: uppercase; }
+.demo-info { font-size: 11.5px; color: #78350f; font-weight: 500; }
+
+/* TABS */
+.tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: 14px 16px; font-size: 11.5px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .15s; }
+.tab:hover { color: var(--ink2); }
+.tab.on { color: var(--pink); border-bottom-color: var(--pink); }
+
+/* SCROLLER */
+.scroller { flex: 1; overflow-y: auto; padding: 28px 32px 100px; background: var(--bg); }
+
+/* CARDS — pattern existant */
+.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px 24px; margin-bottom: 20px; overflow: visible; }
+.section-card-title { font-size: 11.5px; font-weight: 700; color: var(--teal); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px; }
+.section-card-title.with-badge { display: flex; align-items: center; gap: 10px; }
+.badge-new { background: var(--pink); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 100px; letter-spacing: .04em; }
+
+/* SECTION GESTIONNAIRES — multi-select */
+.mgr-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-bottom: 16px; }
+.mgr-info-line { font-size: 12px; color: var(--muted); margin-bottom: 12px; padding: 8px 12px; background: var(--teal-light); border-left: 3px solid var(--teal); border-radius: 0 4px 4px 0; }
+.mgr-info-line strong { color: var(--teal); }
+
+.ms-wrap { position: relative; }
+.ms-trigger { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border2); border-radius: 4px; padding: 10px 12px; cursor: pointer; background: var(--surface); transition: border-color .15s; min-height: 42px; gap: 8px; }
+.ms-trigger:hover { border-color: var(--teal); }
+.ms-trigger.open { border-color: var(--teal); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.ms-trigger-text { flex: 1; font-size: 13px; color: var(--muted2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ms-trigger-text.has-selection { color: var(--ink2); }
+.ms-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--teal-light); color: var(--teal); border-radius: 100px; padding: 3px 8px 3px 10px; font-size: 11.5px; font-weight: 500; }
+.ms-chip-x { cursor: pointer; font-size: 14px; line-height: 1; opacity: .7; }
+.ms-chip-x:hover { opacity: 1; }
+.ms-chevron { font-size: 12px; color: var(--muted2); transition: transform .2s; flex-shrink: 0; }
+.ms-chevron.up { transform: rotate(180deg); }
+.ms-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid var(--teal); border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 12px rgba(0,0,0,.12); z-index: 400; max-height: 320px; overflow-y: auto; }
+.ms-option { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; cursor: pointer; transition: background .1s; border-bottom: 1px solid #f9fafb; }
+.ms-option:last-child { border-bottom: none; }
+.ms-option:hover { background: var(--teal-light); }
+.ms-option input[type=checkbox] { accent-color: var(--teal); width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; margin-top: 2px; }
+.ms-option-info { flex: 1; }
+.ms-option-name { font-size: 13px; color: var(--ink2); font-weight: 500; }
+.ms-option-role { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+
+/* TOGGLE STRIPE */
+.stripe-toggle-row { display: flex; align-items: center; gap: 16px; padding: 4px 0; }
+.stripe-toggle-text { flex: 1; }
+.stripe-toggle-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.stripe-toggle-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+.stripe-toggle-desc strong { color: var(--ink2); font-weight: 500; }
+
+.sw { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.sw input { opacity: 0; width: 0; height: 0; }
+.sw-t { position: absolute; inset: 0; background: #d1d5db; border-radius: 100px; cursor: pointer; transition: background .2s; }
+.sw-t::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.sw input:checked + .sw-t { background: var(--pink); }
+.sw input:checked + .sw-t::before { transform: translateX(20px); }
+
+/* FORMULAIRE STRIPE — pattern existant en colonnes */
+.stripe-form { margin-top: 20px; animation: slideIn .3s ease-out; }
+.stripe-form.hidden { display: none; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
+.form-col { display: flex; flex-direction: column; gap: 20px; }
+.subsection-title { font-size: 11.5px; font-weight: 700; color: var(--teal); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
+.subsection { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; }
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+.lbl { display: block; font-size: 11.5px; color: var(--muted); margin-bottom: 4px; }
+.lbl.req::after { content: ' *'; color: var(--pink); }
+.field-input { width: 100%; border: none; border-bottom: 1px solid var(--border2); padding: 6px 0; font-family: inherit; font-size: 13.5px; outline: none; color: var(--ink); background: transparent; }
+.field-input:focus { border-bottom-color: var(--teal); }
+.field-readonly { background: #f9fafb; padding: 8px 10px; border-radius: 4px; color: var(--muted2); font-size: 13px; min-height: 32px; }
+.dropzone { background: #f9fafb; border: 1px dashed var(--border2); border-radius: 4px; padding: 16px; text-align: center; font-size: 12.5px; color: var(--muted); cursor: pointer; transition: all .15s; }
+.dropzone:hover { background: #f3f4f6; border-color: var(--teal); }
+.helper-text { font-size: 11.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+.add-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--teal); border-radius: 100px; background: var(--surface); color: var(--teal); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.add-btn:hover { background: var(--teal-light); }
+
+/* ACTIONS BAR */
+.actions-bar { position: fixed; bottom: 0; left: var(--sidebar-w); right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 12px 32px; display: flex; justify-content: flex-end; gap: 10px; z-index: 250; }
+.btn-ann { padding: 8px 22px; border: 1px solid var(--border2); border-radius: 7px; background: transparent; color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.btn-ann:hover { border-color: var(--ink2); color: var(--ink2); }
+.btn-save { padding: 8px 26px; border: none; border-radius: 7px; background: var(--teal); color: #fff; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.btn-save:hover { background: var(--teal-dark); }
+
+/* TOAST */
+.toasts { position: fixed; top: 62px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 7px; pointer-events: none; }
+.toast { background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 8px; font-size: 12.5px; display: flex; align-items: center; gap: 9px; box-shadow: 0 4px 16px rgba(0,0,0,.18); max-width: 380px; pointer-events: all; animation: slideInToast .3s; }
+.toast.ok { background: #15803d; }
+@keyframes slideInToast { from { transform: translateX(420px); } to { transform: translateX(0); } }
+.toast-x { margin-left: auto; background: none; border: none; color: rgba(255,255,255,.7); cursor: pointer; font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="t-logo">Maiia<sup>BO</sup></div>
+  <div class="t-sep"></div>
+  <div class="t-title">Modification du centre — Centre Pape</div>
+  <div class="t-right">
+    <div class="t-env"><div class="t-av">A</div>BackOffice Maiia</div>
+    <div class="t-user">NDIAYE Pape Amadou Dieye</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <div class="sidebar">
+    <button class="oneclick-btn">✋ OneClick creation</button>
+    <div class="n on"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Centres</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Praticiens</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Utilisateurs</div>
+    <div class="n"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Offres</div>
+    <div class="n"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>TLC assistée</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Journal</div>
+  </div>
+
+  <div class="content">
+
+   
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab">Paramètres Globaux</div>
+      <div class="tab on">Stripe</div>
+      <div class="tab">Référent</div>
+      <div class="tab">Utilisateurs (5)</div>
+      <div class="tab">Praticiens (5)</div>
+      <div class="tab">TLC Assistée</div>
+      <div class="tab">Fonctionnalités</div>
+      <div class="tab">Hiérarchie</div>
+      <div class="tab">Journal</div>
+      <div class="tab">Statistiques</div>
+    </div>
+
+    <div class="scroller">
+
+      <!-- SECTION 1 — GESTIONNAIRES STRIPE CENTRE -->
+      <div class="section-card">
+        <div class="section-card-title with-badge">
+          <span>GESTIONNAIRES STRIPE CENTRE</span>
+          <span class="badge-new">NOUVEAU</span>
+        </div>
+        <div class="mgr-desc">Désigner un ou plusieurs utilisateurs rattachés à ce centre comme gestionnaires du compte Stripe Centre.</div>
+        <div class="mgr-info-line">
+          ℹ️ Un gestionnaire peut créer et modifier le compte Stripe Centre depuis l'Agenda. <strong>Sans gestionnaire défini, les TLC seront facturées via le compte Stripe personnel de chaque praticien.</strong>
+        </div>
+
+        <div class="ms-wrap" id="ms-wrap">
+          <div class="ms-trigger" id="ms-trigger" onclick="toggleMsDropdown(event)">
+            <div class="ms-trigger-text" id="ms-chips">
+              <span>Sélectionner un ou plusieurs utilisateurs...</span>
+            </div>
+            <span class="ms-chevron" id="ms-chev">▾</span>
+          </div>
+          <div class="ms-dropdown" id="ms-dropdown" style="display:none;">
+            <!-- options injectées par JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2 — CONFIGURATION COMPTE STRIPE (toggle) -->
+      <div class="section-card">
+        <div class="stripe-toggle-row">
+          <div class="stripe-toggle-text">
+            <div class="stripe-toggle-title">Configurer le compte Stripe Centre maintenant</div>
+            <div class="stripe-toggle-desc">
+              La configuration du compte Stripe Centre peut être effectuée par un gestionnaire désigné directement <strong>depuis l'Agenda</strong>.
+              Activez cette option si vous souhaitez la réaliser dès à présent depuis le BO.
+            </div>
+          </div>
+          <label class="sw">
+            <input type="checkbox" id="stripe-toggle" onchange="toggleStripeForm()">
+            <span class="sw-t"></span>
+          </label>
+        </div>
+
+        <!-- FORMULAIRE STRIPE COMPLET -->
+        <div class="stripe-form hidden" id="stripe-form">
+
+          <div class="form-grid">
+
+            <!-- Colonne gauche -->
+            <div class="form-col">
+
+              <!-- INFOS DU CENTRE -->
+              <div class="subsection">
+                <div class="subsection-title">Infos du centre</div>
+                <div class="field">
+                  <label class="lbl">Id du compte stripe</label>
+                  <div class="field-readonly">—</div>
+                </div>
+                <div class="field">
+                  <label class="lbl req">SIRET</label>
+                  <input type="text" class="field-input">
+                </div>
+                <div class="field">
+                  <label class="lbl req">Site Web</label>
+                  <input type="text" class="field-input" value="https://www.maiia.com">
+                </div>
+                <div class="field">
+                  <label class="lbl req">Téléphone du centre</label>
+                  <input type="text" class="field-input" placeholder="🇫🇷 Numéro de téléphone">
+                </div>
+                <div class="field">
+                  <label class="lbl req">IBAN</label>
+                  <input type="text" class="field-input">
+                </div>
+              </div>
+
+              <!-- REPRESENTANT DU COMPTE -->
+              <div class="subsection">
+                <div class="subsection-title">Représentant du compte</div>
+                <div class="field">
+                  <label class="lbl">Choisir un praticien du centre</label>
+                  <select class="field-input"><option>Choisir un praticien du centre</option></select>
+                </div>
+                <div class="field">
+                  <label class="lbl req">Rôle</label>
+                  <input type="text" class="field-input">
+                </div>
+                <div class="field">
+                  <label class="lbl req">Nom</label>
+                  <input type="text" class="field-input">
+                </div>
+                <div class="field">
+                  <label class="lbl req">Prénom</label>
+                  <input type="text" class="field-input">
+                </div>
+                <div class="field">
+                  <label class="lbl req">Date de naissance</label>
+                  <input type="text" class="field-input" placeholder="jj/mm/aaaa">
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Colonne droite -->
+            <div class="form-col">
+
+              <!-- BENEFICIAIRES EFFECTIFS -->
+              <div class="subsection">
+                <div class="subsection-title">Bénéficiaires effectifs finaux (BEF)</div>
+                <div class="helper-text">Déclarez toutes les personnes détenant directement ou indirectement 25% ou plus du capital du centre.</div>
+                <button class="add-btn">+ Ajouter un bénéficiaire</button>
+              </div>
+
+              <!-- DIRECTEURS -->
+              <div class="subsection">
+                <div class="subsection-title">Directeurs</div>
+                <div class="helper-text">Déclarez les membres du conseil d'administration ou personnes responsables de la gestion du centre (CEO, COO, directeur général…).</div>
+                <button class="add-btn">+ Ajouter un directeur</button>
+              </div>
+
+              <!-- VERIFICATION ENTITE JURIDIQUE -->
+              <div class="subsection">
+                <div class="subsection-title">Vérification de l'entité juridique</div>
+                <div class="helper-text">
+                  Stripe vérifie automatiquement votre centre à partir du N° SIRET.
+                  Vous pouvez uploader un document justificatif dès maintenant pour anticiper un éventuel échec de vérification.
+                </div>
+                <div class="field">
+                  <label class="lbl">Document justificatif de l'entité (Kbis, statuts, VAT Registration — JPG, PNG, PDF)</label>
+                  <div class="dropzone">Déposez le fichier à uploader, ou cliquez pour le sélectionner.</div>
+                </div>
+              </div>
+
+              <!-- ATTESTATION NUMERIQUE -->
+              <div class="subsection">
+                <div class="subsection-title">Attestation numérique des bénéficiaires effectifs</div>
+                <div class="helper-text">
+                  Si vous disposez d'un document attestant de l'ensemble des bénéficiaires effectifs (extrait RBE, acte de société, attestation notariée…), vous pouvez l'uploader ici. Ce document est optionnel.
+                </div>
+                <div class="field">
+                  <label class="lbl">Attestation des bénéficiaires effectifs (JPG, PNG, PDF)</label>
+                  <div class="dropzone">Déposez le fichier à uploader, ou cliquez pour le sélectionner.</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="actions-bar">
+      <button class="btn-ann">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        ANNULER
+      </button>
+      <button class="btn-save" onclick="doSave()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/></svg>
+        ENREGISTRER
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+const utilisateurs = [
+  { id: 'u1', name: 'NDIAYE Pape Amadou Dieye', role: 'Praticien' },
+  { id: 'u2', name: 'MARTIN Jean', role: 'Secrétaire' },
+  { id: 'u3', name: 'DURAND Sophie', role: 'Praticien' },
+  { id: 'u4', name: 'CARDHCDTEST SansCpsID', role: 'Praticien' },
+  { id: 'u5', name: 'BERNARD Paul', role: 'Remplaçant' }
+];
+
+let selectedUsers = new Set();
+let dropdownOpen = false;
+
+function renderDropdown() {
+  const dd = document.getElementById('ms-dropdown');
+  dd.innerHTML = utilisateurs.map(u => `
+    <div class="ms-option" onclick="toggleUser('${u.id}')">
+      <input type="checkbox" ${selectedUsers.has(u.id) ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleUser('${u.id}')">
+      <div class="ms-option-info">
+        <div class="ms-option-name">${u.name}</div>
+        <div class="ms-option-role">${u.role}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderChips() {
+  const c = document.getElementById('ms-chips');
+  if (selectedUsers.size === 0) {
+    c.innerHTML = '<span>Sélectionner un ou plusieurs utilisateurs...</span>';
+    c.classList.remove('has-selection');
+  } else {
+    c.classList.add('has-selection');
+    c.innerHTML = Array.from(selectedUsers).map(id => {
+      const u = utilisateurs.find(x => x.id === id);
+      return `<span class="ms-chip">${u.name}<span class="ms-chip-x" onclick="event.stopPropagation(); removeUser('${id}')">×</span></span>`;
+    }).join('');
+  }
+}
+
+function toggleUser(id) {
+  if (selectedUsers.has(id)) selectedUsers.delete(id);
+  else selectedUsers.add(id);
+  renderDropdown();
+  renderChips();
+}
+
+function removeUser(id) {
+  selectedUsers.delete(id);
+  renderDropdown();
+  renderChips();
+}
+
+function toggleMsDropdown(e) {
+  if (e) e.stopPropagation();
+  dropdownOpen = !dropdownOpen;
+  document.getElementById('ms-dropdown').style.display = dropdownOpen ? 'block' : 'none';
+  document.getElementById('ms-trigger').classList.toggle('open', dropdownOpen);
+  document.getElementById('ms-chev').classList.toggle('up', dropdownOpen);
+}
+
+document.addEventListener('click', e => {
+  if (dropdownOpen) {
+    const w = document.getElementById('ms-wrap');
+    if (w && !w.contains(e.target)) {
+      dropdownOpen = false;
+      document.getElementById('ms-dropdown').style.display = 'none';
+      document.getElementById('ms-trigger').classList.remove('open');
+      document.getElementById('ms-chev').classList.remove('up');
+    }
+  }
+});
+
+function toggleStripeForm() {
+  const on = document.getElementById('stripe-toggle').checked;
+  const f = document.getElementById('stripe-form');
+  f.classList.toggle('hidden', !on);
+}
+
+function doSave() {
+  const stripeOn = document.getElementById('stripe-toggle').checked;
+  let msg = 'Modifications enregistrées';
+  if (selectedUsers.size > 0) msg += ` — ${selectedUsers.size} gestionnaire${selectedUsers.size > 1 ? 's' : ''} Stripe défini${selectedUsers.size > 1 ? 's' : ''}`;
+  if (stripeOn) msg += ' + compte Stripe Centre configuré';
+  toast(msg, 'ok');
+}
+
+function toast(msg, type) {
+  const c = document.getElementById('toasts');
+  const d = document.createElement('div');
+  d.className = 'toast ' + (type || 'ok');
+  d.innerHTML = `<span>✓</span>${msg}<button class="toast-x" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(d);
+  setTimeout(() => d.remove(), 4000);
+}
+
+renderDropdown();
+renderChips();
+</script>
+</body>
+</html>
