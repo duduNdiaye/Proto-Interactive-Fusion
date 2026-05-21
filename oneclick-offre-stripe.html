@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maiia BO — Création d'un client OneClick</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal: #00a99d; --teal-dark: #008c82; --teal-light: #e8f7f6;
+  --pink: #e91e8c; --pink-light: #fce4ec; --pink-soft: #f8a5c2;
+  --bg: #f4f5f7; --surface: #fff;
+  --ink: #1f2937; --ink2: #374151;
+  --muted: #6b7280; --muted2: #9ca3af;
+  --border: #e5e7eb; --border2: #d1d5db;
+  --orange: #d97706;
+  --sidebar-w: 228px; --top-h: 52px;
+}
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Inter', sans-serif; background: var(--surface); color: var(--ink2); font-size: 13.5px; }
+
+/* TOPBAR */
+.topbar { height: var(--top-h); background: var(--teal); display: flex; align-items: center; padding: 0 18px; gap: 12px; position: fixed; inset: 0 0 auto 0; z-index: 300; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.t-logo { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 5px; }
+.t-logo sup { font-size: 9px; background: rgba(255,255,255,.22); color: #fff; border-radius: 3px; padding: 1px 4px; font-weight: 700; }
+.t-sep { width: 1px; height: 18px; background: rgba(255,255,255,.25); }
+.t-title { font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,.95); }
+.t-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.t-env { background: rgba(0,0,0,.18); color: #fff; border-radius: 100px; padding: 4px 12px; font-size: 11.5px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.t-av { width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,.22); font-size: 9px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; }
+.t-user { font-size: 12.5px; color: rgba(255,255,255,.9); font-weight: 500; }
+
+/* LAYOUT */
+.layout { display: flex; height: 100vh; padding-top: var(--top-h); }
+
+/* SIDEBAR */
+.sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); position: fixed; top: var(--top-h); left: 0; bottom: 0; overflow-y: auto; z-index: 200; padding: 10px 0 20px; }
+.oneclick-btn { margin: 8px 10px 10px; background: var(--pink); color: #fff; border: none; border-radius: 100px; padding: 8px 0; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; justify-content: center; width: calc(100% - 20px); }
+.n { display: flex; align-items: center; gap: 9px; padding: 8px 16px; font-size: 13px; color: var(--ink2); cursor: pointer; white-space: nowrap; position: relative; }
+.n svg { width:15px; height:15px; flex-shrink:0; opacity:.55; stroke:currentColor; fill:none; stroke-width:2; }
+.n:hover { background: #f9fafb; }
+.n .chev { margin-left: auto; font-size: 9px; color: var(--muted2); }
+
+/* CONTENT */
+.content { margin-left: var(--sidebar-w); flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+/* DEMO PANEL */
+.demo-panel { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 8px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #fcd34d; flex-shrink: 0; flex-wrap: wrap; }
+.demo-panel-label { font-size: 10.5px; font-weight: 700; color: #78350f; letter-spacing: .08em; text-transform: uppercase; }
+.demo-info { font-size: 11.5px; color: #78350f; font-weight: 500; }
+
+/* SCROLLER + CARD */
+.scroller { flex:1; overflow-y:auto; padding: 32px 56px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; max-width: 1200px; margin: 0 auto; padding: 28px 36px 32px; }
+
+/* STEPPER */
+.stepper { display: flex; align-items: flex-start; justify-content: space-between; position: relative; padding: 8px 32px 28px; }
+.stepper::before { content: ''; position: absolute; top: 28px; left: 13%; right: 13%; height: 2px; background: var(--teal-light); z-index: 0; }
+.stepper-line-active { position: absolute; top: 28px; left: 13%; height: 2px; background: var(--teal); z-index: 0; transition: width .3s; }
+.step { display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; z-index: 1; flex: 1; }
+.step-icon { width: 56px; height: 56px; border-radius: 50%; background: #d1d5db; display: flex; align-items: center; justify-content: center; transition: all .25s; }
+.step-icon svg { width: 26px; height: 26px; fill: #fff; }
+.step.done .step-icon { background: var(--teal); }
+.step.current .step-icon { background: var(--pink); }
+.step-label { font-size: 13.5px; color: var(--ink2); font-weight: 400; }
+.step.done .step-label, .step.current .step-label { color: var(--ink); font-weight: 500; }
+
+/* FORM CONTENT */
+.form-section { max-width: 760px; margin: 0 auto; padding-top: 16px; }
+.f-row { margin-bottom: 24px; }
+.lbl { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.lbl.req::after { content: ' *'; color: var(--pink); }
+.field-input { width: 100%; border: none; border-bottom: 1px solid var(--border2); padding: 6px 0; font-family: inherit; font-size: 13.5px; outline: none; color: var(--ink); }
+.field-input:focus { border-bottom-color: var(--teal); }
+
+/* OFFRE SELECT */
+.offre-wrap { position: relative; }
+.offre-trigger { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border2); cursor: pointer; transition: border-color .15s; }
+.offre-trigger:hover { border-bottom-color: var(--teal); }
+.offre-trigger.has-value { color: var(--ink); font-weight: 500; }
+.offre-trigger.placeholder { color: var(--muted2); }
+.offre-trigger .chev { color: var(--muted2); font-size: 10px; }
+.offre-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,.12); z-index: 200; max-height: 320px; overflow-y: auto; margin-top: 2px; }
+.offre-option { padding: 9px 14px; font-size: 13px; color: var(--ink2); cursor: pointer; border-bottom: 1px solid #f9fafb; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.offre-option:last-child { border-bottom: none; }
+.offre-option:hover { background: var(--pink-light); }
+.offre-option .badge-tlc { background: var(--pink-light); color: var(--pink); font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 100px; letter-spacing: .03em; flex-shrink: 0; }
+
+/* TOGGLES */
+.toggle-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f3f4f6; }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-lbl { flex: 1; font-size: 14px; color: var(--ink2); display: flex; align-items: center; gap: 8px; }
+.toggle-lbl.disabled { color: var(--muted2); }
+.sw { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+.sw input { opacity: 0; width: 0; height: 0; }
+.sw-t { position: absolute; inset: 0; background: #d1d5db; border-radius: 100px; cursor: pointer; transition: background .2s; }
+.sw-t::before { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.sw input:checked + .sw-t { background: var(--pink); }
+.sw input:checked + .sw-t::before { transform: translateX(16px); }
+.sw input:disabled + .sw-t { opacity: .5; cursor: not-allowed; }
+
+/* TOGGLE GESTIONNAIRE (ligne nouvelle, intégrée aux autres) */
+.toggle-mgr-row { animation: slideInRow .25s ease-out; }
+.toggle-mgr-row.highlight { background: rgba(0,169,157,.04); margin: 0 -36px; padding-left: 36px; padding-right: 36px; }
+@keyframes slideInRow { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.mgr-label-text { display: flex; align-items: center; gap: 6px; }
+.mgr-info-trigger { width: 16px; height: 16px; border-radius: 50%; background: var(--teal-light); color: var(--teal); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; cursor: help; position: relative; }
+.mgr-info-trigger:hover .mgr-tooltip { opacity: 1; visibility: visible; transform: translateY(0); }
+.mgr-tooltip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(4px); background: var(--ink); color: #fff; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 400; line-height: 1.45; width: 280px; opacity: 0; visibility: hidden; transition: all .2s; box-shadow: 0 6px 16px rgba(0,0,0,.2); z-index: 500; pointer-events: none; }
+.mgr-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--ink); }
+.mgr-tooltip strong { font-weight: 600; }
+.mgr-badge-new { background: var(--pink); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 100px; letter-spacing: .04em; margin-left: 4px; }
+.mgr-helper { font-size: 11.5px; color: var(--muted); margin-top: 4px; padding-left: 0; font-style: italic; }
+.mgr-helper .warn { color: var(--orange); }
+
+/* STRIPE TOGGLE WRAP */
+.stripe-toggle-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px 22px; margin-bottom: 24px; }
+.stripe-toggle-row-main { display: flex; align-items: center; gap: 16px; }
+.stripe-toggle-text { flex: 1; }
+.stripe-toggle-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.stripe-toggle-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.mgr-info-line { font-size: 12px; color: var(--muted); margin-bottom: 12px; padding: 8px 12px; background: var(--teal-light); border-left: 3px solid var(--teal); border-radius: 0 4px 4px 0; }
+.stripe-form { animation: slideIn .3s ease-out; margin-top: 8px; }
+.stripe-form.hidden { display: none; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.stripe-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; }
+.stripe-form-full { grid-column: 1 / -1; }
+
+/* ACTIONS BAR — boutons en bas centrés (comme la capture) */
+.actions-bar { padding: 18px 0 0; display: flex; justify-content: center; gap: 28px; border-top: 1px solid var(--border); margin-top: 32px; }
+.btn-prev { padding: 8px 28px; border: none; background: transparent; color: var(--pink); font-family: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: .04em; cursor: pointer; text-transform: uppercase; }
+.btn-prev:hover { text-decoration: underline; }
+.btn-next { padding: 9px 36px; border: none; border-radius: 100px; background: var(--pink); color: #fff; font-family: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: .04em; cursor: pointer; text-transform: uppercase; transition: background .15s; }
+.btn-next:not(:disabled):hover { background: var(--pink-dark, #c81a7a); }
+.btn-next:disabled { background: var(--pink-soft); cursor: not-allowed; }
+
+/* TOAST */
+.toasts { position: fixed; top: 62px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 7px; pointer-events: none; }
+.toast { background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 8px; font-size: 12.5px; display: flex; align-items: center; gap: 9px; box-shadow: 0 4px 16px rgba(0,0,0,.18); max-width: 380px; pointer-events: all; animation: slideInToast .3s; }
+.toast.ok { background: #15803d; }
+.toast.warn { background: var(--orange); }
+@keyframes slideInToast { from { transform: translateX(420px); } to { transform: translateX(0); } }
+.toast-x { margin-left: auto; background: none; border: none; color: rgba(255,255,255,.7); cursor: pointer; font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="t-logo">Maiia<sup>BO</sup></div>
+  <div class="t-sep"></div>
+  <div class="t-title">Création d'un client OneClick</div>
+  <div class="t-right">
+    <div class="t-env"><div class="t-av">A</div>BackOffice Maiia</div>
+    <div class="t-user">NDIAYE Pape Amadou Dieye</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <div class="sidebar">
+    <button class="oneclick-btn">✋ OneClick creation</button>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Centres</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Praticiens</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Utilisateurs</div>
+    <div class="n"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Offres</div>
+    <div class="n"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>TLC assistée</div>
+    <div class="n"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Journal</div>
+  </div>
+
+  <div class="content">
+
+
+    <div class="scroller">
+      <div class="card">
+
+        <!-- STEPPER -->
+        <div class="stepper" id="stepper">
+          <div class="stepper-line-active" id="stepLine" style="width: 25%;"></div>
+          <div class="step done">
+            <div class="step-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="step-label">Praticien</div>
+          </div>
+          <div class="step done">
+            <div class="step-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+            <div class="step-label">Centre</div>
+          </div>
+          <div class="step current" id="step-offre">
+            <div class="step-icon"><svg viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" fill="#fff" font-size="18" font-weight="700" font-family="Inter">$</text></svg></div>
+            <div class="step-label">Offre</div>
+          </div>
+          <div class="step" id="step-stripe">
+            <div class="step-icon"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/></svg></div>
+            <div class="step-label">Stripe</div>
+          </div>
+          <div class="step" id="step-resume">
+            <div class="step-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div>
+            <div class="step-label">Résumé</div>
+          </div>
+        </div>
+
+        <!-- CONTENU ÉTAPE -->
+        <div id="stepContent"></div>
+
+        <!-- ACTIONS -->
+        <div class="actions-bar">
+          <button class="btn-prev" onclick="prevStep()">RETOUR</button>
+          <button class="btn-next" id="btn-next" onclick="nextStep()">SUIVANT</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// STATE
+let currentStep = 'offre';
+let offreChoisie = null;
+let offreDropdownOpen = false;
+let mgrChecked = null;
+let stripeToggleOn = false;
+
+const CENTRE_EXISTANT = {
+  id: 'pape',
+  name: 'Centre Pape',
+  gestionnairesCount: 0
+};
+
+const offresDispo = [
+  { name: 'Offre Factu', isTlc: false },
+  { name: 'Maiia Infi', isTlc: false },
+  { name: 'Offre Fab', isTlc: false },
+  { name: 'TEST', isTlc: false },
+  { name: 'Offre All', isTlc: false },
+  { name: 'Offre Agenda Premium', isTlc: false },
+  { name: 'Offre TLC non payante', isTlc: false },
+  { name: 'OFFRE-DEMO', isTlc: false },
+  { name: 'Offre pack Agenda Premium + TLC', isTlc: true },
+  { name: 'Offre Agenda Initial (Gratuit)', isTlc: false },
+  { name: 'Offre TLS (Agenda + SMS)', isTlc: false },
+  { name: 'Offre TLC (Agenda + TLC)', isTlc: true }
+];
+
+function isTlcPaid(name) {
+  if (!name) return false;
+  const o = offresDispo.find(o => o.name === name);
+  return o ? o.isTlc : false;
+}
+
+function nextStep() {
+  if (currentStep === 'offre') {
+    currentStep = 'stripe';
+    updateStepper();
+    render();
+  } else if (currentStep === 'stripe') {
+    if (stripeToggleOn) {
+      const required = ['s-dn','s-tel','s-adresse','s-cp','s-ville','s-iban'];
+      const missing = required.some(id => {
+        const el = document.getElementById(id);
+        return el && !el.value.trim();
+      });
+      if (missing) {
+        toast("Veuillez remplir tous les champs obligatoires du formulaire Stripe.", 'warn');
+        return;
+      }
+    }
+    toast(stripeToggleOn ? "Étape Stripe validée — passage au Résumé" : "Stripe non configuré — passage direct au Résumé", 'ok');
+  }
+}
+
+function prevStep() {
+  if (currentStep === 'stripe') {
+    currentStep = 'offre';
+    updateStepper();
+    render();
+  }
+}
+
+function updateStepper() {
+  const offre = document.getElementById('step-offre');
+  const stripe = document.getElementById('step-stripe');
+  const line = document.getElementById('stepLine');
+
+  if (currentStep === 'offre') {
+    offre.classList.add('current');
+    offre.classList.remove('done');
+    stripe.classList.remove('current', 'done');
+    line.style.width = '25%';
+  } else if (currentStep === 'stripe') {
+    offre.classList.remove('current');
+    offre.classList.add('done');
+    stripe.classList.add('current');
+    line.style.width = '50%';
+  }
+}
+
+function toggleOffreDropdown(e) {
+  if (e) e.stopPropagation();
+  offreDropdownOpen = !offreDropdownOpen;
+  render();
+}
+
+function selectOffre(name, e) {
+  if (e) e.stopPropagation();
+  offreChoisie = name;
+  offreDropdownOpen = false;
+  if (!isTlcPaid(name)) mgrChecked = null;
+  render();
+}
+
+function toggleMgr() {
+  mgrChecked = !mgrChecked;
+  render();
+}
+
+function toggleStripe() {
+  stripeToggleOn = !stripeToggleOn;
+  render();
+}
+
+document.addEventListener('click', e => {
+  if (offreDropdownOpen) {
+    const w = document.getElementById('offre-wrap');
+    if (w && !w.contains(e.target)) {
+      offreDropdownOpen = false;
+      render();
+    }
+  }
+});
+
+function render() {
+  const c = document.getElementById('stepContent');
+  if (currentStep === 'offre') c.innerHTML = renderOffre();
+  else if (currentStep === 'stripe') c.innerHTML = renderStripe();
+}
+
+function renderOffre() {
+  const tlc = isTlcPaid(offreChoisie);
+
+  // Pré-cochage gestionnaire
+  let mgrIsChecked = mgrChecked;
+  if (tlc && mgrIsChecked === null) {
+    mgrIsChecked = CENTRE_EXISTANT.gestionnairesCount === 0;
+    mgrChecked = mgrIsChecked;
+  }
+
+  const offreText = offreChoisie
+    ? `<span class="has-value-text">${offreChoisie}${tlc ? ' <span style="color:var(--pink); font-size:10.5px; font-weight:700; margin-left:6px;">TLC PAYANTE</span>' : ''}</span>`
+    : `<span></span>`;
+
+  // Toggles standards + ligne gestionnaire intégrée si TLC
+  const togglesHtml = offreChoisie ? `
+    <div style="margin-top: 28px;">
+      <div class="toggle-row"><div class="toggle-lbl">Agenda</div><label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label></div>
+      <div class="toggle-row"><div class="toggle-lbl">Visible sur Maiia</div><label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label></div>
+      <div class="toggle-row"><div class="toggle-lbl">RDV en ligne sur Maiia</div><label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label></div>
+      <div class="toggle-row"><div class="toggle-lbl">Envoi de SMS</div><label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label></div>
+      <div class="toggle-row"><div class="toggle-lbl">Chat</div><label class="sw"><input type="checkbox" checked><span class="sw-t"></span></label></div>
+      <div class="toggle-row"><div class="toggle-lbl">Premium</div><label class="sw"><input type="checkbox" ${tlc ? 'checked' : ''}><span class="sw-t"></span></label></div>
+      <div class="toggle-row"><div class="toggle-lbl">Tap to Pay</div><label class="sw"><input type="checkbox"><span class="sw-t"></span></label></div>
+      <div class="toggle-row"><div class="toggle-lbl">Module IA</div><label class="sw"><input type="checkbox"><span class="sw-t"></span></label></div>
+      ${tlc ? `
+      <div class="toggle-row toggle-mgr-row">
+        <div class="toggle-lbl">
+          <span class="mgr-label-text">
+            Désigner ce praticien comme gestionnaire Stripe Centre
+            <span class="mgr-info-trigger">
+              i
+              <span class="mgr-tooltip">
+                <strong>Gestionnaire Stripe Centre</strong> : peut créer et modifier le compte Stripe Centre depuis l'Agenda. Ce compte permet aux praticiens du centre de recevoir les paiements de leurs téléconsultations.
+              </span>
+            </span>
+            <span class="mgr-badge-new">NOUVEAU</span>
+          </span>
+        </div>
+        <label class="sw">
+          <input type="checkbox" ${mgrIsChecked ? 'checked' : ''} onchange="toggleMgr()">
+          <span class="sw-t"></span>
+        </label>
+      </div>
+      <div class="mgr-helper">
+        <span class="warn">⚠</span> Centre Pape — Aucun gestionnaire actuellement configuré
+      </div>
+      ` : ''}
+    </div>
+  ` : '';
+
+  return `
+    <div class="form-section">
+      <div class="f-row">
+        <label class="lbl req">Offre</label>
+        <div class="offre-wrap" id="offre-wrap">
+          <div class="offre-trigger ${offreChoisie ? 'has-value' : 'placeholder'}" onclick="toggleOffreDropdown(event)">
+            ${offreText}
+            <span class="chev">▾</span>
+          </div>
+          ${offreDropdownOpen ? `
+            <div class="offre-dropdown">
+              ${offresDispo.map(o => `
+                <div class="offre-option" onclick="selectOffre('${o.name.replace(/'/g,"\\'")}', event)">
+                  <span>${o.name}</span>
+                  ${o.isTlc ? '<span class="badge-tlc">TLC PAYANTE</span>' : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+      ${togglesHtml}
+    </div>
+  `;
+}
+
+function renderStripe() {
+  return `
+    <div class="form-section">
+      <div class="stripe-toggle-block">
+        <div class="stripe-toggle-row-main">
+          <div class="stripe-toggle-text">
+            <div class="stripe-toggle-title">Configurer le compte Stripe du praticien</div>
+            <div class="mgr-info-line">Activez l'option pour configurer le compte Stripe dès maintenant. <strong>Sinon, le praticien pourra le faire plus tard depuis son Agenda.</strong></div>
+          </div>
+          <label class="sw" style="width:44px; height:24px;">
+            <input type="checkbox" ${stripeToggleOn ? 'checked' : ''} onchange="toggleStripe()">
+            <span class="sw-t"></span>
+          </label>
+        </div>
+
+        <div class="stripe-form ${stripeToggleOn ? '' : 'hidden'}">
+          <hr style="border:none; border-top:1px solid var(--border); margin:18px 0;">
+          <div class="toggle-row" style="padding:0 0 16px;"><div class="toggle-lbl">Associer un compte STRIPE de démo</div><label class="sw"><input type="checkbox"><span class="sw-t"></span></label></div>
+          <div class="stripe-form-grid">
+            <div>
+              <label class="lbl req">Date de naissance</label>
+              <input type="text" id="s-dn" class="field-input" placeholder="jj/mm/aaaa">
+            </div>
+            <div>
+              <label class="lbl req">Téléphone</label>
+              <input type="text" id="s-tel" class="field-input" placeholder="07 58 32 61 54">
+            </div>
+            <div class="stripe-form-full">
+              <label class="lbl req">Adresse</label>
+              <input type="text" id="s-adresse" class="field-input" placeholder="25 Rue d'Aguesseau 92100 Boulogne-Billancourt">
+            </div>
+            <div>
+              <label class="lbl req">Code postal</label>
+              <input type="text" id="s-cp" class="field-input" placeholder="92100">
+            </div>
+            <div>
+              <label class="lbl req">Ville</label>
+              <input type="text" id="s-ville" class="field-input" placeholder="Boulogne-Billancourt">
+            </div>
+            <div class="stripe-form-full">
+              <label class="lbl req">IBAN</label>
+              <input type="text" id="s-iban" class="field-input" placeholder="FR76 1234 5678 9012 3456 7890 123">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toast(msg, type) {
+  const c = document.getElementById('toasts');
+  const d = document.createElement('div');
+  d.className = 'toast ' + (type || 'ok');
+  d.innerHTML = `<span>${type === 'warn' ? '⚠️' : '✓'}</span>${msg}<button class="toast-x" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(d);
+  setTimeout(() => d.remove(), 4500);
+}
+
+render();
+</script>
+</body>
+</html>
