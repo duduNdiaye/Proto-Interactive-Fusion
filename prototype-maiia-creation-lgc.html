@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Prototype Maiia BO - Création synchro LGC</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #172B4D;
+  background: #f5f7fa;
+  font-size: 14px;
+  line-height: 1.4;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* Layout */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 235px;
+  background: white;
+  border-right: 1px solid #e5e9f0;
+  min-height: 100vh;
+  padding-bottom: 20px;
+}
+.sidebar-header {
+  background: #14b8a6;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-header .logo {
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+}
+.sidebar-header .icons { margin-left: auto; display: flex; gap: 10px; }
+.sidebar-header .icons svg { width: 18px; height: 18px; fill: white; opacity: 0.8; }
+
+.oneclick-btn {
+  margin: 15px 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #ff4785 0%, #ff2d75 100%);
+  color: white;
+  border-radius: 25px;
+  width: calc(100% - 24px);
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 3px 8px rgba(255, 45, 117, 0.3);
+}
+.oneclick-btn::before { content: "👆"; font-size: 14px; }
+
+.sidebar-nav { padding: 0 8px; }
+.sidebar-nav .nav-item {
+  padding: 10px 14px;
+  border-radius: 6px;
+  color: #172B4D;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+.sidebar-nav .nav-item:hover { background: #f0f4f8; }
+.sidebar-nav .nav-item.active { background: #e6fcfa; color: #14b8a6; font-weight: 600; }
+.sidebar-nav .nav-item svg { width: 16px; height: 16px; fill: #6b7684; }
+.sidebar-nav .nav-item.active svg { fill: #14b8a6; }
+.sidebar-nav .nav-item .chevron { margin-left: auto; opacity: 0.4; }
+
+/* Header */
+.main { flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.header {
+  background: white;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid #e5e9f0;
+  justify-content: flex-end;
+}
+.header-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #172B4D; }
+.header-item .badge {
+  background: #f0f4f8;
+  color: #172B4D;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.header-item .badge.a { background: #14b8a6; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; }
+.header .refresh { color: #14b8a6; }
+
+/* Content */
+.content { padding: 24px; flex: 1; }
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #172B4D;
+  margin-bottom: 6px;
+}
+.page-badge {
+  display: inline-block;
+  background: #f0f4f8;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #6b7684;
+  margin-bottom: 20px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #e5e9f0;
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+.tab {
+  padding: 12px 16px;
+  color: #6b7684;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.tab:hover { color: #172B4D; }
+.tab.active { color: #14b8a6; border-bottom-color: #14b8a6; font-weight: 600; }
+.tab .count {
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  margin-left: 4px;
+}
+
+/* Interop panel */
+.panel {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e9f0;
+  padding: 24px;
+  min-height: 400px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e9f0;
+}
+.panel-title {
+  color: #14b8a6;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: #14b8a6;
+  color: white;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid #14b8a6;
+}
+.btn-primary:hover { background: #0f9d8f; }
+.btn-primary:disabled { background: #d1d5db; border-color: #d1d5db; cursor: not-allowed; }
+
+.btn-secondary {
+  background: white;
+  color: #14b8a6;
+  padding: 9px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid #14b8a6;
+}
+.btn-secondary:hover { background: #f0fdfa; }
+
+.btn-primary-round {
+  background: #14b8a6;
+  color: white;
+  padding: 9px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid #14b8a6;
+}
+.btn-primary-round:hover { background: #0f9d8f; }
+.btn-primary-round:disabled { background: #c8e6e2; border-color: #c8e6e2; cursor: not-allowed; }
+
+/* Filter */
+.filter {
+  padding: 9px 14px;
+  border: 1px solid #d5dae2;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #172B4D;
+  background: white;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+.filter::after { content: "▾"; color: #6b7684; margin-left: 10px; }
+
+/* LGC Row (dans la liste existante) */
+.lgc-row {
+  border: 1px solid #e5e9f0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.lgc-row:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.1);
+}
+.lgc-row-content {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.lgc-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #e6fcfa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #14b8a6;
+  font-size: 20px;
+  position: relative;
+  flex-shrink: 0;
+}
+.lgc-avatar::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  background: #14b8a6;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+.lgc-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: #172B4D;
+}
+.lgc-badge {
+  background: #f0f4f8;
+  color: #172B4D;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 10px;
+}
+.lgc-status {
+  color: #6b7684;
+  font-size: 13px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lgc-status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff9500;
+}
+.lgc-status.synced .dot { background: #22c55e; }
+.chevron-right {
+  color: #6b7684;
+  margin-left: auto;
+  font-size: 20px;
+  transition: transform 0.2s;
+}
+.lgc-row:hover .chevron-right { color: #14b8a6; }
+
+/* Info note */
+.info-note {
+  background: #e6fcfa;
+  border-left: 3px solid #14b8a6;
+  padding: 14px 18px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.info-note .icon {
+  color: #14b8a6;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.info-note .text { color: #172B4D; font-size: 13px; }
+.info-note .text strong { display: block; margin-bottom: 3px; }
+
+/* LGC Cards (page création) */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 30px 40px;
+  background: white;
+  border: 1px solid #e5e9f0;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+.step .circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #14b8a6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+.step.current .circle {
+  background: white;
+  border: 2px dashed #14b8a6;
+  color: #14b8a6;
+}
+.step-indicator::before {
+  content: "";
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  top: 47px;
+  height: 2px;
+  background: #14b8a6;
+  z-index: 1;
+}
+.step .label { font-size: 13px; color: #172B4D; }
+.step.current .label { color: #14b8a6; font-weight: 600; }
+
+.lgc-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+.lgc-card {
+  background: white;
+  border: 1px solid #e5e9f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.15s;
+}
+.lgc-card:hover { border-color: #14b8a6; }
+.lgc-card.selected { border-color: #14b8a6; box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.15); }
+.lgc-card-header {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f0f4f8;
+}
+.lgc-card-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.lgc-card-checkbox.checked {
+  background: #14b8a6;
+  border-color: #14b8a6;
+}
+.lgc-card-checkbox.checked::after {
+  content: "✓";
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+.lgc-card-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e6fcfa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #14b8a6;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.lgc-card-logo.mc {
+  background: #172B4D;
+  color: white;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.lgc-card-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #172B4D;
+}
+.lgc-card-body {
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.lgc-card-body .info {
+  flex: 1;
+  font-size: 12px;
+  color: #6b7684;
+  line-height: 1.5;
+}
+.lgc-card-body .info strong { color: #172B4D; display: block; margin-bottom: 3px; font-size: 13px; font-weight: 600; }
+
+/* Toggle */
+.toggle {
+  width: 36px;
+  height: 20px;
+  background: #d1d5db;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.toggle.on { background: #14b8a6; }
+.toggle.on::after { left: 18px; }
+
+/* Bottom actions */
+.bottom-actions {
+  background: white;
+  border-top: 1px solid #e5e9f0;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.btn-back {
+  background: white;
+  color: #14b8a6;
+  padding: 9px 24px;
+  border-radius: 20px;
+  border: 1px solid #14b8a6;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Modale */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 43, 77, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: white;
+  border-radius: 8px;
+  padding: 28px;
+  width: 500px;
+  max-width: 90vw;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #172B4D;
+  margin-bottom: 16px;
+}
+.modal-body { color: #172B4D; font-size: 14px; line-height: 1.6; margin-bottom: 8px; }
+.modal-body strong { display: block; margin: 12px 0 8px; }
+.modal-lgc-list { list-style: none; padding: 0; margin: 8px 0 16px; }
+.modal-lgc-list li {
+  padding: 8px 12px;
+  background: #f0f4f8;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.modal-lgc-list .lgc-card-logo { width: 24px; height: 24px; font-size: 11px; }
+.modal-info {
+  background: #fffaeb;
+  border-left: 3px solid #f59e0b;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #172B4D;
+  margin-bottom: 20px;
+}
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.btn-cancel {
+  padding: 9px 20px;
+  color: #6b7684;
+  font-weight: 600;
+  font-size: 13px;
+}
+.btn-cancel:hover { color: #172B4D; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: #14b8a6;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+  display: none;
+  align-items: center;
+  gap: 10px;
+  z-index: 200;
+  animation: slideIn 0.3s ease-out;
+}
+.toast.show { display: flex; }
+.toast::before { content: "✓"; font-weight: 700; }
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* View transitions */
+.view { display: none; }
+.view.active { display: block; }
+
+/* Coordination detail */
+.coord-detail {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #e5e9f0;
+}
+.coord-field {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f4f8;
+}
+.coord-field:last-child { border-bottom: none; }
+.coord-field .label { flex: 0 0 220px; color: #6b7684; font-size: 13px; }
+.coord-field .value { color: #172B4D; font-weight: 500; font-size: 14px; }
+.coord-field .value input {
+  border: 1px solid #d5dae2;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13px;
+  width: 300px;
+  font-family: inherit;
+}
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.status-badge.a-associer { background: #fff3cd; color: #92400e; }
+.status-badge.synced { background: #d1fae5; color: #065f46; }
+.back-link {
+  color: #14b8a6;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.back-link:hover { text-decoration: underline; }
+
+/* Guide */
+.step-hint {
+  position: fixed;
+  bottom: 20px;
+  left: 250px;
+  right: 20px;
+  background: #172B4D;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.step-hint .step-num {
+  background: #14b8a6;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.step-hint .close {
+  margin-left: auto;
+  cursor: pointer;
+  color: rgba(255,255,255,0.7);
+  padding: 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">Maiia</span>
+      <div class="icons">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/><path d="M12 8v4M12 16h.01" stroke="white" stroke-width="2"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20" stroke="white" stroke-width="2"/></svg>
+      </div>
+    </div>
+    <button class="oneclick-btn">OneClick creation</button>
+    <nav class="sidebar-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
+        Centres
+      </div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg>Praticiens</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/></svg>Utilisateurs</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/></svg>Utilisateurs à vérifier</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>TLC assistée</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8-10-8-10-8z"/></svg>Observatoire</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 5-5"/></svg>Données ERP<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Patients</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Offres</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/></svg>Spécialités</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/></svg>Expertises</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Journal</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/></svg>MediSecu</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>Référentiels<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/></svg>Mutuelles / Caisses<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>Matériel<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Coordinations<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>Applications<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Campagnes<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07"/></svg>Notification<span class="chevron">▾</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Statistiques</div>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-item"><span class="badge a">A</span><strong>BackOffice Maiia</strong></div>
+      <div class="header-item refresh">↻</div>
+      <div class="header-item">Pape Amadou Dieye NDIAYE</div>
+      <div class="header-item">↪</div>
+    </div>
+
+    <!-- VIEW 1 : Onglet Interopérabilité avec bouton Créer -->
+    <div class="view active" id="view-1">
+      <div class="content">
+        <div class="page-title">Cabinet Produit</div>
+        <div class="page-badge">Démo</div>
+
+        <div class="tabs">
+          <div class="tab">Paramètres globaux</div>
+          <div class="tab">Hiérarchie</div>
+          <div class="tab active">Interopérabilité <span class="count" id="interop-count">(1)</span></div>
+          <div class="tab">Référent</div>
+          <div class="tab">Stripe</div>
+          <div class="tab">Utilisateurs <span class="count">(0)</span></div>
+          <div class="tab">Praticiens</div>
+          <div class="tab">Relais téléconsultation</div>
+          <div class="tab">Fonctionnalités</div>
+          <div class="tab">Journal</div>
+          <div class="tab">Statistiques</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Logiciels de coordination</div>
+            <button class="btn-primary-round" onclick="goToView2()">+ Créer</button>
+          </div>
+
+          <div class="filter">Tous les statuts</div>
+
+          <div id="lgc-list">
+            <div class="lgc-row" onclick="goToCoordDetail()">
+              <div class="lgc-row-content">
+                <div class="lgc-avatar">👥</div>
+                <div>
+                  <div><span class="lgc-name">TEST PAUL</span><span class="lgc-badge">1 instance</span></div>
+                  <div class="lgc-status"><span class="dot"></span>1 à associer</div>
+                </div>
+                <div class="chevron-right">›</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-actions">
+        <div></div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-cancel">Annuler</button>
+          <button class="btn-primary-round" disabled>Enregistrer</button>
+        </div>
+      </div>
+
+      <div class="step-hint">
+        <div class="step-num">1</div>
+        <div>Clique sur le bouton <strong>+ Créer</strong> en haut à droite pour ouvrir la page de sélection LGC.</div>
+      </div>
+    </div>
+
+    <!-- VIEW 2 : Page de sélection LGC (basée sur ton screenshot 2) -->
+    <div class="view" id="view-2">
+      <div class="content">
+        <div class="page-title">Création d'une synchronisation</div>
+        <div style="color: #6b7684; font-size: 13px; margin-bottom: 20px;">
+          <span onclick="goToView1()" class="back-link">← Retour à la fiche centre</span>
+        </div>
+
+        <div class="panel" style="min-height: auto;">
+          <h3 style="margin-bottom: 20px; font-size: 16px; color: #172B4D;">Interopérabilité</h3>
+
+          <div class="info-note">
+            <div class="icon">ⓘ</div>
+            <div class="text">
+              <strong>Note</strong>
+              Sélectionnez le ou les logiciels avec lesquels vous souhaitez créer une coordination. Chaque logiciel coché donnera lieu à la création d'une coordination associée.
+            </div>
+          </div>
+
+          <div class="lgc-cards-grid">
+
+            <div class="lgc-card" id="card-mgb">
+              <div class="lgc-card-header">
+                <div class="lgc-card-checkbox" onclick="toggleCard('mgb')"></div>
+                <div class="lgc-card-logo">👥</div>
+                <div class="lgc-card-name">MGB</div>
+              </div>
+              <div class="lgc-card-body">
+                <div class="info">
+                  <strong>Centre de santé</strong>
+                  À activer pour les structures de type Centre de santé (CDS) afin d'activer le mode de coordination associé.
+                </div>
+                <div class="toggle" onclick="toggleSwitch(this)"></div>
+              </div>
+            </div>
+
+            <div class="lgc-card" id="card-mediclick">
+              <div class="lgc-card-header">
+                <div class="lgc-card-checkbox" onclick="toggleCard('mediclick')"></div>
+                <div class="lgc-card-logo mc">MC</div>
+                <div class="lgc-card-name">Médiclick</div>
+              </div>
+              <div class="lgc-card-body">
+                <div class="info">
+                  <strong>Centre de santé</strong>
+                  À activer pour les structures de type Centre de santé (CDS) afin d'activer le mode de coordination associé.
+                </div>
+                <div class="toggle" onclick="toggleSwitch(this)"></div>
+              </div>
+            </div>
+
+            <div class="lgc-card" id="card-testpaul">
+              <div class="lgc-card-header">
+                <div class="lgc-card-checkbox" onclick="toggleCard('testpaul')"></div>
+                <div class="lgc-card-logo">👥</div>
+                <div class="lgc-card-name">TEST PAUL</div>
+              </div>
+              <div class="lgc-card-body">
+                <div class="info">
+                  <strong>Centre de santé</strong>
+                  À activer pour les structures de type Centre de santé (CDS) afin d'activer le mode de coordination associé.
+                </div>
+                <div class="toggle" onclick="toggleSwitch(this)"></div>
+              </div>
+            </div>
+
+            <div class="lgc-card" id="card-vocca">
+              <div class="lgc-card-header">
+                <div class="lgc-card-checkbox" onclick="toggleCard('vocca')"></div>
+                <div class="lgc-card-logo" style="background: #f0f4f8; color: #172B4D;">V</div>
+                <div class="lgc-card-name">Vocca</div>
+              </div>
+              <div class="lgc-card-body">
+                <div class="info">
+                  <strong>Centre de santé</strong>
+                  À activer pour les structures de type Centre de santé (CDS) afin d'activer le mode de coordination associé.
+                </div>
+                <div class="toggle" onclick="toggleSwitch(this)"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-actions">
+        <button class="btn-back" onclick="goToView1()">Précédent</button>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-cancel" onclick="goToView1()">Annuler</button>
+          <button class="btn-primary-round" id="save-btn" disabled onclick="openConfirmModal()">Enregistrer</button>
+        </div>
+      </div>
+
+      <div class="step-hint">
+        <div class="step-num">2</div>
+        <div>Coche un ou plusieurs LGC puis clique sur <strong>Enregistrer</strong> pour ouvrir la modale de confirmation.</div>
+      </div>
+    </div>
+
+    <!-- VIEW 3 : Détail coordination -->
+    <div class="view" id="view-3">
+      <div class="content">
+        <span onclick="goToView1()" class="back-link">← Retour à la fiche centre</span>
+        <div class="page-title" style="margin-top: 12px;">Coordination Vocca - Cabinet Produit</div>
+
+        <div class="coord-detail">
+          <div class="coord-field"><span class="label">Centre</span><span class="value">Cabinet Produit</span></div>
+          <div class="coord-field"><span class="label">Logiciel</span><span class="value"><span class="lgc-badge" style="background: #f0f4f8;">Vocca</span></span></div>
+          <div class="coord-field"><span class="label">Statut</span><span class="value"><span class="status-badge a-associer">À Associer</span></span></div>
+          <div class="coord-field">
+            <span class="label">Identifiant de synchronisation du centre</span>
+            <span class="value"><input type="text" placeholder="À renseigner par l'OPS (Ivanti)"></span>
+          </div>
+          <div class="coord-field"><span class="label">Adresse MAC</span><span class="value" style="color: #6b7684;">Non applicable</span></div>
+          <div class="coord-field"><span class="label">secureKey</span><span class="value" style="color: #6b7684; font-family: monospace; font-size: 12px;">a8f2c9d7b3e4f6a1c9d2b8e4</span></div>
+          <div class="coord-field"><span class="label">Date de création</span><span class="value">14 juillet 2026 à 10:23</span></div>
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button class="btn-secondary">Enregistrer</button>
+            <button class="btn-primary" disabled style="opacity: 0.5;">Générer un code d'activation</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-hint">
+        <div class="step-num">4</div>
+        <div>Depuis la liste des logiciels de coordination, un <strong>clic direct sur une ligne LGC</strong> ouvre la fiche coordination correspondante.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modale confirmation -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <div class="modal-title">Confirmer la création des coordinations</div>
+    <div class="modal-body">Vous êtes sur le point de créer une coordination pour les LGC suivants :</div>
+    <ul class="modal-lgc-list" id="modal-lgc-list"></ul>
+    <div class="modal-info">Chaque coordination créée devra ensuite être complétée depuis le menu <strong>Coordination</strong>.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-primary-round" onclick="confirmCreation()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">Coordinations créées.</div>
+
+<script>
+const selected = {};
+
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  const box = card.querySelector('.lgc-card-checkbox');
+  const isChecked = box.classList.toggle('checked');
+  card.classList.toggle('selected', isChecked);
+  selected[id] = isChecked;
+  updateSaveBtn();
+}
+function toggleSwitch(el) { event.stopPropagation(); el.classList.toggle('on'); }
+function updateSaveBtn() {
+  const anySelected = Object.values(selected).some(Boolean);
+  document.getElementById('save-btn').disabled = !anySelected;
+}
+function goToView1() {
+  showView('view-1');
+}
+function goToView2() {
+  showView('view-2');
+}
+function goToCoordDetail() {
+  showView('view-3');
+}
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+const lgcMeta = {
+  mgb: { name: 'MGB', logo: '👥', cls: '' },
+  mediclick: { name: 'Médiclick', logo: 'MC', cls: 'mc' },
+  testpaul: { name: 'TEST PAUL', logo: '👥', cls: '' },
+  vocca: { name: 'Vocca', logo: 'V', cls: '' }
+};
+
+function openConfirmModal() {
+  const list = document.getElementById('modal-lgc-list');
+  list.innerHTML = '';
+  Object.keys(selected).forEach(k => {
+    if (selected[k]) {
+      const m = lgcMeta[k];
+      const li = document.createElement('li');
+      li.innerHTML = '<div class="lgc-card-logo ' + m.cls + '" style="background:' + (m.cls === 'mc' ? '#172B4D' : (k === 'vocca' ? '#f0f4f8' : '#e6fcfa')) + '; color:' + (m.cls === 'mc' ? 'white' : (k === 'vocca' ? '#172B4D' : '#14b8a6')) + ';">' + m.logo + '</div>' + m.name;
+      list.appendChild(li);
+    }
+  });
+  document.getElementById('modal-confirm').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal-confirm').classList.remove('show');
+}
+function confirmCreation() {
+  closeModal();
+  // Ajout dynamique des LGC créés dans la liste
+  const list = document.getElementById('lgc-list');
+  Object.keys(selected).forEach(k => {
+    if (selected[k]) {
+      const m = lgcMeta[k];
+      const row = document.createElement('div');
+      row.className = 'lgc-row';
+      row.onclick = goToCoordDetail;
+      const bg = m.cls === 'mc' ? '#172B4D' : (k === 'vocca' ? '#f0f4f8' : '#e6fcfa');
+      const fg = m.cls === 'mc' ? 'white' : (k === 'vocca' ? '#172B4D' : '#14b8a6');
+      row.innerHTML = `
+        <div class="lgc-row-content">
+          <div class="lgc-avatar" style="background:${bg};color:${fg};">${m.logo}</div>
+          <div>
+            <div><span class="lgc-name">${m.name}</span><span class="lgc-badge">1 instance</span></div>
+            <div class="lgc-status"><span class="dot"></span>1 à associer</div>
+          </div>
+          <div class="chevron-right">›</div>
+        </div>
+      `;
+      list.appendChild(row);
+    }
+  });
+  // Mise à jour du compteur d'onglet
+  const total = list.querySelectorAll('.lgc-row').length;
+  document.getElementById('interop-count').textContent = '(' + total + ')';
+  // Reset la sélection et les checkboxes
+  Object.keys(selected).forEach(k => selected[k] = false);
+  document.querySelectorAll('.lgc-card-checkbox').forEach(b => b.classList.remove('checked'));
+  document.querySelectorAll('.lgc-card').forEach(c => c.classList.remove('selected'));
+  updateSaveBtn();
+  showToast();
+  goToView1();
+}
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+
+</body>
+</html>
